@@ -1,19 +1,24 @@
 package models
 
-import dao.UserDao
+import javax.inject.{Inject, Singleton}
+
+import models.db.Tables
 import play.api.data.{Form, Mapping}
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 import play.api.data.validation.{Constraint, Invalid, Valid}
+import services.DBService
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+import utils.db.TetraoPostgresDriver.api._
 
 case class FormDataLogin(email: String, password: String)
 
 case class FormDataAccount(name:String, email: String, password: String, passwordAgain:String)
 
-object FormData {
+@Singleton
+class FormData @Inject()(val database: DBService) {
 
   val login = Form(
     mapping(
@@ -30,7 +35,12 @@ object FormData {
   )
 
   val uniqueEmail = Constraint[String] { email: String =>
-    val userFuture = UserDao.findByEmail(email)
+    //Valid
+    val q = Tables.Account.filter { row =>
+      row.email === email
+    }
+
+    val userFuture = database.runAsync(q.result.headOption)
 
     Await.result(userFuture, Duration.Inf) match {
       case Some(user) => Invalid("email already taken")

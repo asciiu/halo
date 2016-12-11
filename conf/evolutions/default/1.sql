@@ -34,7 +34,7 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO player;
 
 -- bcrypted password values are password in both users
 INSERT INTO users (name, email, email_confirmed, role, password) values ('Admin User', 'admin@email.com', true, 'admin', '$2a$10$8K1p/a0dL1LXMIgoEDFrwOfMQbLgtnOoKsWc.6U6H0llP3puzeeEu');
-INSERT INTO users (name, email, email_confirmed, role, password) values ('Bob Minion', 'bob@email.com', true, 'normal', '$2a$10$8K1p/a0dL1LXMIgoEDFrwOfMQbLgtnOoKsWc.6U6H0llP3puzeeEu');
+INSERT INTO users (name, email, email_confirmed, role, password) values ('Jane Doe', 'jane@email.com', true, 'normal', '$2a$10$8K1p/a0dL1LXMIgoEDFrwOfMQbLgtnOoKsWc.6U6H0llP3puzeeEu');
 INSERT INTO message (content, tag_list) values ('Welcome to the templatesite!', '{"welcome", "first message", "english"}');
 
 

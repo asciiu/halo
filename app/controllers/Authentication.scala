@@ -28,6 +28,7 @@ import utils.Mailer
 class Authentication @Inject()(val database: DBService,
                                val messagesApi: MessagesApi,
                                val mailService: MailService,
+                               val formData: FormData,
                                implicit val webJarAssets: WebJarAssets) extends Controller with AuthConfigTrait with OptionalAuthElement with LoginLogout with I18nSupport {
 
   implicit val ms = mailService
@@ -38,7 +39,7 @@ class Authentication @Inject()(val database: DBService,
     if (loggedIn.isDefined) {
       Redirect(routes.RestrictedApplication.messages())
     } else {
-      Ok(views.html.auth.login(FormData.login))
+      Ok(views.html.auth.login(formData.login))
     }
   }
 
@@ -47,7 +48,7 @@ class Authentication @Inject()(val database: DBService,
   }
 
   def login() = Action.async { implicit request =>
-    FormData.login.bindFromRequest.fold(
+    formData.login.bindFromRequest.fold(
       formWithErrors => {
         println(formWithErrors)
         Future.successful(BadRequest(views.html.auth.login(formWithErrors)))
@@ -64,7 +65,7 @@ class Authentication @Inject()(val database: DBService,
           }
           case _ => {
             Logger.warn(s"Failed login by ${account.email}")
-            val form = FormData.login.fill(account).withGlobalError("Invalid email/password")
+            val form = formData.login.fill(account).withGlobalError("Invalid email/password")
             Future.successful(BadRequest(views.html.auth.login(form)))
           }
         }
@@ -76,7 +77,7 @@ class Authentication @Inject()(val database: DBService,
     * Starts the sign up mechanism. It shows a form that the user have to fill in and submit.
     */
   def signup() = StackAction { implicit request =>
-    Ok(views.html.auth.signup(FormData.addAccount))
+    Ok(views.html.auth.signup(formData.addAccount))
   }
 
   /**
@@ -84,7 +85,7 @@ class Authentication @Inject()(val database: DBService,
     * with a link to verify his email address.
     */
   def handleSignUp() = Action.async { implicit request =>
-    FormData.addAccount.bindFromRequest.fold(
+    formData.addAccount.bindFromRequest.fold(
       formWithErrors => Future.successful(BadRequest(views.html.auth.signup(formWithErrors))),
       accountFormData => {
         if(accountFormData.password.nonEmpty && accountFormData.password == accountFormData.passwordAgain) {
@@ -109,7 +110,7 @@ class Authentication @Inject()(val database: DBService,
             Ok(views.html.auth.almostSignedUp(accountFormData))
           }
         } else {
-          val form = FormData.addAccount.fill(accountFormData).withError("passwordAgain", "Passwords don't match")
+          val form = formData.addAccount.fill(accountFormData).withError("passwordAgain", "Passwords don't match")
           Future.successful(BadRequest(views.html.auth.signup(form)))
         }
       }

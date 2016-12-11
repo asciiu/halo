@@ -19,13 +19,14 @@ import scala.concurrent.Future
 @Singleton
 class RestrictedApplication @Inject()(val database: DBService,
                                       val messagesApi: MessagesApi,
+                                      val formData: FormData,
                                       implicit val webJarAssets: WebJarAssets)
   extends Controller with AuthConfigTrait with AuthElement with I18nSupport {
 
   def messages() = AsyncStack(AuthorityKey -> AccountRole.normal) { implicit request =>
     database.runAsync(Tables.Message.sortBy(_.id).result).map { rowSeq =>
       val messageSeq = rowSeq.map(Message(_))
-      Ok(views.html.messages(loggedIn, messageSeq, FormData.addMessage))
+      Ok(views.html.messages(loggedIn, messageSeq, formData.addMessage))
     }
   }
 
@@ -37,7 +38,7 @@ class RestrictedApplication @Inject()(val database: DBService,
   }
 
   def addMessage() = AsyncStack(AuthorityKey -> AccountRole.normal) { implicit request =>
-    FormData.addMessage.bindFromRequest.fold(
+    formData.addMessage.bindFromRequest.fold(
       formWithErrors => Future.successful(Redirect(routes.RestrictedApplication.messages())),
       message => {
         database.runAsync((Tables.Message returning Tables.Message.map(_.id)) += message.toRow()).map { id =>
@@ -49,16 +50,16 @@ class RestrictedApplication @Inject()(val database: DBService,
   }
 
   def account() = StackAction(AuthorityKey -> AccountRole.normal) { implicit request =>
-    val form = FormData.updateAccount.fill(FormDataAccount(loggedIn.data.name, loggedIn.data.email, "", ""))
+    val form = formData.updateAccount.fill(FormDataAccount(loggedIn.data.name, loggedIn.data.email, "", ""))
     Ok(views.html.account(loggedIn, form, insert = false))
   }
 
   def updateAccount() = AsyncStack(AuthorityKey -> AccountRole.normal) { implicit request =>
-    FormData.updateAccount.bindFromRequest.fold(
+    formData.updateAccount.bindFromRequest.fold(
       formWithErrors => Future.successful(BadRequest(views.html.account(loggedIn, formWithErrors, insert = false))),
       accountFormData => {
         if(accountFormData.password.nonEmpty && accountFormData.password != accountFormData.passwordAgain) {
-          val form = FormData.addAccount.fill(accountFormData).withError("passwordAgain", "Passwords don't match")
+          val form = formData.addAccount.fill(accountFormData).withError("passwordAgain", "Passwords don't match")
           Future.successful(BadRequest(views.html.account(loggedIn, form, insert = false)))
         } else {
           val now = OffsetDateTime.now()
@@ -85,11 +86,11 @@ class RestrictedApplication @Inject()(val database: DBService,
   }
 
   def newAccount() = StackAction(AuthorityKey -> AccountRole.admin) { implicit request =>
-    Ok(views.html.account(loggedIn, FormData.addAccount, insert = true))
+    Ok(views.html.account(loggedIn, formData.addAccount, insert = true))
   }
 
   def addAccount() = AsyncStack(AuthorityKey -> AccountRole.admin) { implicit request =>
-    FormData.addAccount.bindFromRequest.fold(
+    formData.addAccount.bindFromRequest.fold(
       formWithErrors => Future.successful(BadRequest(views.html.account(loggedIn, formWithErrors, insert = true))),
       accountFormData => {
         if(accountFormData.password.nonEmpty && accountFormData.password == accountFormData.passwordAgain) {
@@ -109,7 +110,7 @@ class RestrictedApplication @Inject()(val database: DBService,
             Redirect(routes.RestrictedApplication.messages())
           }
         } else {
-          val form = FormData.addAccount.fill(accountFormData).withError("passwordAgain", "Passwords don't match")
+          val form = formData.addAccount.fill(accountFormData).withError("passwordAgain", "Passwords don't match")
           Future.successful(BadRequest(views.html.account(loggedIn, form, insert = true)))
         }
       }

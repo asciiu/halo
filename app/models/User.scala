@@ -1,6 +1,5 @@
 package models
 
-import dao.UserDao
 import scala.concurrent.Future
 
 case class User(id: Option[Long] = None,
