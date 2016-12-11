@@ -1,4 +1,4 @@
-name := "template-site"
+name := "halo"
 
 //common settings for the project and subprojects
 lazy val commonSettings = Seq(
@@ -23,9 +23,11 @@ lazy val root = (project in file("."))
 		libraryDependencies += "com.github.t3hnar" %% "scala-bcrypt" % "2.6",
 		libraryDependencies += "org.webjars" %% "webjars-play" % "2.5.0",
 		libraryDependencies += "org.webjars" % "foundation" % "6.2.3",
-		libraryDependencies += "com.typesafe.play" %% "play-mailer" % "5.0.0"
+		libraryDependencies += "com.typesafe.play" %% "play-mailer" % "5.0.0",
+		libraryDependencies += filters
 	)
   .enablePlugins(PlayScala)
+
 
 //to generate models/db/Tables.scala
 addCommandAlias("tables", "run-main utils.db.SourceCodeGenerator")
