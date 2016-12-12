@@ -1,8 +1,9 @@
 package controllers
 
 // external
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 
+import akka.actor.ActorRef
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsError, Json}
@@ -11,18 +12,15 @@ import play.api.mvc.{Action, Controller}
 import scala.concurrent.Future
 
 // Internal
+import models.sports._
 import services.DBService
 
 
 class Arbiter @Inject() (val database: DBService,
                          val messagesApi: MessagesApi,
+                         @Named("bookie") bookie: ActorRef,
                          implicit val webJarAssets: WebJarAssets)
   extends Controller with AuthConfigTrait with OptionalAuthElement with I18nSupport  {
-
-  case class SportsEventOdds(europe: Double, american: Option[Int])
-  case class SportsEventLine(name: String, odds: SportsEventOdds)
-  case class SportsEvent(name: String, time: String, lines: Seq[SportsEventLine])
-  case class SportsBook(exchange: String, sport: String, events: Seq[SportsEvent])
 
   implicit val oddsRead = Json.reads[SportsEventOdds]
   implicit val lineRead = Json.reads[SportsEventLine]
@@ -37,8 +35,8 @@ class Arbiter @Inject() (val database: DBService,
       errors => {
         Future.successful(BadRequest(Json.obj("status" ->"KO", "message" -> JsError.toJson(errors))))
       },
-      book => {
-        println(book)
+      newBook => {
+        bookie ! newBook
         Future.successful(Ok(Json.obj("status" ->"OK", "message" -> ("Received") )))
       }
     )
