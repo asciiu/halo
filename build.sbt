@@ -24,7 +24,9 @@ lazy val root = (project in file("."))
 		libraryDependencies += "org.webjars" %% "webjars-play" % "2.5.0",
 		libraryDependencies += "org.webjars" % "foundation" % "6.2.3",
 		libraryDependencies += "com.typesafe.play" %% "play-mailer" % "5.0.0",
-		libraryDependencies += filters
+		libraryDependencies += filters,
+		libraryDependencies += specs2 % Test
+
 	)
   .enablePlugins(PlayScala)
 

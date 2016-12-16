@@ -22,16 +22,11 @@ class Arbiter @Inject() (val database: DBService,
                          implicit val webJarAssets: WebJarAssets)
   extends Controller with AuthConfigTrait with OptionalAuthElement with I18nSupport  {
 
-  implicit val oddsRead = Json.reads[SportsEventOdds]
-  implicit val lineRead = Json.reads[SportsEventLine]
-  implicit val eventRead = Json.reads[SportsEvent]
-  implicit val bookReads = Json.reads[SportsBook]
-
   /**
     * Post new sportsbook events here.
     */
   def addEvents() = Action.async( parse.json ) { implicit request =>
-    request.body.validate[SportsBook].fold (
+    request.body.validate[SportsBookData].fold (
       errors => {
         Future.successful(BadRequest(Json.obj("status" ->"KO", "message" -> JsError.toJson(errors))))
       },
@@ -40,5 +35,13 @@ class Arbiter @Inject() (val database: DBService,
         Future.successful(Ok(Json.obj("status" ->"OK", "message" -> ("Received") )))
       }
     )
+  }
+
+  /**
+    * Should display a view of betting lines with odds for a specific sport.
+    */
+  def sportLines(sportName: String) = Action.async { implicit request =>
+
+    Future.successful(Ok(""))
   }
 }
