@@ -26,4 +26,6 @@ POST    /messages/:id/delete        controllers.RestrictedApplication.deleteMess
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 GET     /webjars/*file              controllers.WebJarAssets.at(file)
 
+
 POST    /events                     controllers.Arbiter.addEvents()
+GET     /matrices                   controllers.Arbiter.matrices(filter: Option[String])

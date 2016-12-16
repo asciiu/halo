@@ -1,0 +1,32 @@
+@(account: Option[Entity[Account]], bookNames: Set[String], keya: String, keyb: String, linea: List[Double], lineb: List[Double])(implicit webJarAssets: WebJarAssets, messages: Messages)
+
+@_template(account) {
+    <div class="row">
+        <div class="medium-12 columns">
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        @for(name <- bookNames) {
+                            <th>@name</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>@keya</td>
+                        @for(a <- linea) {
+                            <td>@a</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>@keyb</td>
+                        @for(b <- lineb) {
+                            <td>@b</td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
