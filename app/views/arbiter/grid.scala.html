@@ -1,7 +1,10 @@
-@(account: Option[Entity[Account]], bookNames: Set[String], keya: String, keyb: String, linea: List[Double], lineb: List[Double])(implicit webJarAssets: WebJarAssets, messages: Messages)
+@(account: Option[Entity[Account]], sportName: String, bookNames: Set[String], keya: String, keyb: String, linea: List[Double], lineb: List[Double])(implicit webJarAssets: WebJarAssets, messages: Messages)
 
 @_template(account) {
     <div class="row">
+        <div>
+            @sportName
+        </div>
         <div class="medium-12 columns">
             <table>
                 <thead>

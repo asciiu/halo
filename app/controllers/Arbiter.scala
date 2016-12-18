@@ -18,7 +18,7 @@ import services.DBService
 
 class Arbiter @Inject() (val database: DBService,
                          val messagesApi: MessagesApi,
-                         @Named("bookie") bookie: ActorRef,
+                         @Named("exchange") exchange: ActorRef,
                          implicit val webJarAssets: WebJarAssets)
   extends Controller with AuthConfigTrait with OptionalAuthElement with I18nSupport  {
 
@@ -31,7 +31,7 @@ class Arbiter @Inject() (val database: DBService,
         Future.successful(BadRequest(Json.obj("status" ->"KO", "message" -> JsError.toJson(errors))))
       },
       newBook => {
-        bookie ! newBook
+        exchange ! newBook
         Future.successful(Ok(Json.obj("status" ->"OK", "message" -> ("Received") )))
       }
     )
@@ -61,6 +61,15 @@ class Arbiter @Inject() (val database: DBService,
     val betline2 = SportsEventLine(part1, 2.0)
     matrix.addMatchOdds(bookName3, matchName, betline1, betline2)
 
+    val bookName4 = "BetOnline"
+    val betonline1 = SportsEventLine(part2, 8.1)
+    val betonline2 = SportsEventLine(part1, 3.0)
+    matrix.addMatchOdds(bookName4, matchName, betonline1, betonline2)
+
+    val betonline3 = SportsEventLine("Tigers", 8.1)
+    val betonline4 = SportsEventLine("Red Sox", 3.0)
+    matrix.addMatchOdds(bookName4, "Red Sox - Tigers", betonline3, betonline4)
+
     val bookNames = matrix.bookNames
     val matchs = matrix.matchNames
     val (keya, keyb) = matchs.map{ name =>
@@ -69,10 +78,10 @@ class Arbiter @Inject() (val database: DBService,
     }.head
 
     val odds = matrix.matchOdds(matchs.head).sortBy(_.bookname)
-    println(odds)
     val linea = odds.map(_.a)
     val lineb = odds.map(_.b)
+    val sportName = matrix.sportName
 
-    Future.successful(Ok(views.html.arbiter.grid(loggedIn, bookNames, keya, keyb, linea, lineb)))
+    Future.successful(Ok(views.html.arbiter.grid(loggedIn, sportName, bookNames, keya, keyb, linea, lineb)))
   }
 }

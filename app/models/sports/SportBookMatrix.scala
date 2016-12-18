@@ -33,6 +33,22 @@ class SportBookMatrix(val sportName: String) {
     }
   }
 
+  def acceptData(events: Seq[SportsEvent]): Unit = {
+    for (event <- events) {
+      val eventName = event.name
+      val eventTime = event.time
+      val lines = event.lines
+
+      println(s"$eventName $eventTime")
+
+      for (line <- lines) {
+        val lineName = line.name
+        val odds = line.odds
+        println(s"$lineName $odds")
+      }
+    }
+  }
+
   def addMatchOdds(bookName: String, matchName: String, line1: SportsEventLine, line2: SportsEventLine): Unit = {
     allBookNames += bookName
 
