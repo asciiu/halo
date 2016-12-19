@@ -1,0 +1,23 @@
+@(account: Option[Entity[Account]], data: List[models.sports.SportsData])(implicit webJarAssets: WebJarAssets, messages: Messages)
+
+@_template(account) {
+    @for(sportData <- data) {
+        <div class="row">
+            <div class="medium-12 columns">
+                @sportData.sportname
+            </div>
+            @for(event <- sportData.events) {
+            <div class="medium-4 columns end">
+                  <div>@event.name</div>
+                  <div>@event.time</div>
+
+                      <table>
+                          @for(option <- event.lines) {
+                              <tr><td>@option.name</td><td>@option.odds</td></tr>
+                          }
+                      </table>
+            </div>
+            }
+        </div>
+    }
+}

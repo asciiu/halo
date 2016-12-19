@@ -1,9 +1,15 @@
-package models.sports
+package models.sports.analytics
 
 import java.time.LocalDateTime
+
 import scala.collection.mutable
 
 
+/**
+  * Keeps track of the movement on odds for a given option name.
+  * @param optionName
+  * @param open
+  */
 class OddsTracker(val optionName: String, val open: Double) {
 
   case class Stamp(odds: Double, timestamp: LocalDateTime)

@@ -3,21 +3,27 @@ package services.actors
 // external
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import javax.inject.Inject
+
+import akka.util.Timeout
+import models.sports.Bookmaker.SendAllData
+import models.sports.SportsData
 import play.api.Configuration
+
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 import scala.language.postfixOps
+import scala.concurrent.duration._
 
 // internal
 import models.sports.Bookmaker
 import models.sports.{ SportsBookData, SportsBookOdds }
 import services.DBService
-import SportsBookOdds._
 
 
 object Exchange {
 
   case object BookmakerNames
+  case class BookData(bookname: String)
 }
 /**
   * This actor is reponsible for managing all sports books.
@@ -29,6 +35,8 @@ class Exchange @Inject()(val database: DBService, conf: Configuration)
 
   // maps bookmaker name to actor that persists the bookmaker data
   val bookmakers = mutable.Map[String, ActorRef]()
+  implicit val timeout = Timeout(5 seconds)
+
 
   override def preStart() = {
     log.info("Started exchanger")
@@ -51,8 +59,11 @@ class Exchange @Inject()(val database: DBService, conf: Configuration)
       }
       ref ! sportsBookData
 
-    case bookname: String =>
-      sender ! bookactor(bookname)
+    case BookData(bookname) =>
+      bookactor(bookname) match {
+        case Some(actor) => actor ! SendAllData(sender)
+        case None => sender ! List[SportsData]()
+      }
 
     /**
       * returns a list of strings

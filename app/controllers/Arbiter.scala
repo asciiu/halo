@@ -1,17 +1,15 @@
 package controllers
 
 // external
-import javax.inject.{Inject, Named}
-
 import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
+import javax.inject.{Inject, Named}
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{Action, Controller}
-import services.actors.Exchange.BookmakerNames
-
+import services.actors.Exchange.{BookData, BookmakerNames}
 import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -93,12 +91,11 @@ class Arbiter @Inject() (val database: DBService,
   }
 
   def bookmaker(bookname: String) = AsyncStack { implicit request =>
-    (exchange ? bookname).mapTo[Option[ActorRef]].map { optRef =>
-      optRef match {
-        case Some(actor) =>
-          Ok("true")
-        case None =>
-          NotFound(bookname)
+    (exchange ? BookData(bookname)).mapTo[List[SportsData]].map { list =>
+      if (list.nonEmpty) {
+        Ok(views.html.arbiter.bookmaker(loggedIn, list))
+      } else {
+        NotFound(bookname)
       }
     }
   }

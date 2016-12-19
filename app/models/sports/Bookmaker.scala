@@ -2,6 +2,8 @@ package models.sports
 
 // external
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import models.sports.analytics.Sport
+
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -13,7 +15,8 @@ import scala.language.postfixOps
 object Bookmaker {
   def props(name: String) = Props(new Bookmaker(name))
 
-  case object SportNames
+  case class SendSportNames(out: ActorRef)
+  case class SendAllData(out: ActorRef)
 }
 
 /**
@@ -23,7 +26,8 @@ class Bookmaker (val name: String)(implicit ctx: ExecutionContext) extends Actor
   import Bookmaker._
 
   // maps sportname to the actor that manages that sport
-  val sports = mutable.Map[String, ActorRef]()
+  //val sports = mutable.Map[String, ActorRef]()
+  val sports = mutable.Map[String, Sport]()
 
   override def preStart() = {
     log.info(s"Started ${self.path}")
@@ -38,21 +42,32 @@ class Bookmaker (val name: String)(implicit ctx: ExecutionContext) extends Actor
       val sportName = data.sport
 
       val ref = sports.get (sportName) match {
-        case Some(actor) => actor
+        case Some(sport) => sport
         case None =>
-          val newRef = context.actorOf(SportBook.props(sportName), name = sportName.replace(" ", ""))
-          sports += sportName -> newRef
-          newRef
+          //val newRef = context.actorOf(SportBook.props(sportName), name = sportName.replace(" ", ""))
+          val newSport = new Sport(sportName)
+          sports += sportName -> newSport
+          newSport
       }
-      ref ! data.events
+      ref.receive(data.events)
+
+    /**
+      * returns all current data for this bookmaker
+      */
+    case SendAllData(out) =>
+      out ! allData()
 
     /**
       * returns name of all sports as
       * list of Strings
       */
-    case SportNames =>
-      sender ! sports.keys.toList
+    case SendSportNames(out) =>
+      out ! sports.keys.toList
 
+  }
+
+  private def allData(): List[SportsData] = {
+    sports.values.map(_.sportData).toList
   }
 }
 

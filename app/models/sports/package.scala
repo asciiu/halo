@@ -19,6 +19,7 @@ package object sports {
 
   case class SportsEventLine(name: String, odds: Double)
   case class SportsEvent(name: String, time: String, lines: Seq[SportsEventLine])
+  case class SportsData(sportname: String, events: Seq[SportsEvent])
   case class SportsBookData(bookname: String, sport: String, events: Seq[SportsEvent])
 
   // reads
