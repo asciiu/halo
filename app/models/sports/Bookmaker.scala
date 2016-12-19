@@ -2,7 +2,6 @@ package models.sports
 
 // external
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -13,13 +12,17 @@ import scala.language.postfixOps
 
 object Bookmaker {
   def props(name: String) = Props(new Bookmaker(name))
+
+  case object SportNames
 }
 
 /**
   * This actor will represent all activity under a single bookmaker.
   */
 class Bookmaker (val name: String)(implicit ctx: ExecutionContext) extends Actor with ActorLogging {
+  import Bookmaker._
 
+  // maps sportname to the actor that manages that sport
   val sports = mutable.Map[String, ActorRef]()
 
   override def preStart() = {
@@ -42,6 +45,14 @@ class Bookmaker (val name: String)(implicit ctx: ExecutionContext) extends Actor
           newRef
       }
       ref ! data.events
+
+    /**
+      * returns name of all sports as
+      * list of Strings
+      */
+    case SportNames =>
+      sender ! sports.keys.toList
+
   }
 }
 

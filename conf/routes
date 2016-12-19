@@ -29,3 +29,5 @@ GET     /webjars/*file              controllers.WebJarAssets.at(file)
 
 POST    /events                     controllers.Arbiter.addEvents()
 GET     /matrices                   controllers.Arbiter.matrices(filter: Option[String])
+GET     /bookmaker                  controllers.Arbiter.bookmaker(bookname: String)
+GET     /bookmaker/names            controllers.Arbiter.bookmakerNames()

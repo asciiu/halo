@@ -4,12 +4,17 @@ package controllers
 import javax.inject.{Inject, Named}
 
 import akka.actor.ActorRef
+import akka.pattern.ask
+import akka.util.Timeout
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{Action, Controller}
+import services.actors.Exchange.BookmakerNames
 
+import scala.concurrent.duration._
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 // Internal
 import models.sports._
@@ -21,6 +26,8 @@ class Arbiter @Inject() (val database: DBService,
                          @Named("exchange") exchange: ActorRef,
                          implicit val webJarAssets: WebJarAssets)
   extends Controller with AuthConfigTrait with OptionalAuthElement with I18nSupport  {
+
+  implicit val timeout = Timeout(5 seconds)
 
   /**
     * Post new sportsbook events here.
@@ -83,5 +90,22 @@ class Arbiter @Inject() (val database: DBService,
     val sportName = matrix.sportName
 
     Future.successful(Ok(views.html.arbiter.grid(loggedIn, sportName, bookNames, keya, keyb, linea, lineb)))
+  }
+
+  def bookmaker(bookname: String) = AsyncStack { implicit request =>
+    (exchange ? bookname).mapTo[Option[ActorRef]].map { optRef =>
+      optRef match {
+        case Some(actor) =>
+          Ok("true")
+        case None =>
+          NotFound(bookname)
+      }
+    }
+  }
+
+  def bookmakerNames() = AsyncStack { implicit request =>
+    (exchange ? BookmakerNames).mapTo[List[String]].map { names =>
+      Ok(names.toString)
+    }
   }
 }

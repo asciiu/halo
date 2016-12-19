@@ -15,12 +15,19 @@ import services.DBService
 import SportsBookOdds._
 
 
+object Exchange {
+
+  case object BookmakerNames
+}
 /**
   * This actor is reponsible for managing all sports books.
   */
 class Exchange @Inject()(val database: DBService, conf: Configuration)
                    (implicit ctx: ExecutionContext) extends Actor with ActorLogging {
 
+  import Exchange._
+
+  // maps bookmaker name to actor that persists the bookmaker data
   val bookmakers = mutable.Map[String, ActorRef]()
 
   override def preStart() = {
@@ -43,6 +50,22 @@ class Exchange @Inject()(val database: DBService, conf: Configuration)
           nef
       }
       ref ! sportsBookData
+
+    case bookname: String =>
+      sender ! bookactor(bookname)
+
+    /**
+      * returns a list of strings
+      */
+    case BookmakerNames =>
+      sender ! bookmakers.keys.toList
+  }
+
+  private def bookactor(bookname: String): Option[ActorRef] = {
+    bookmakers.get(bookname) match {
+      case Some(maker) => Some(maker)
+      case None => None
+    }
   }
 }
 

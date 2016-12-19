@@ -13,6 +13,7 @@ object SportBook {
 
 class SportBook(val sportName: String) extends Actor with ActorLogging {
 
+  // maps an event name to an actor that tracks the odds
   private val eventRefs = mutable.Map[String, ActorRef]()
 
   override def preStart() = {
@@ -43,4 +44,5 @@ class SportBook(val sportName: String) extends Actor with ActorLogging {
       }
   }
 
+  def eventNames = eventRefs.keys.toList
 }

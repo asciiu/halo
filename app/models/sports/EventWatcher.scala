@@ -8,6 +8,8 @@ import scala.collection.mutable
 
 object EventWatcher {
   def props(eventName: String, time: String) = Props(new EventWatcher(eventName, time))
+
+  case class GetCurrentOdds(optionName: String)
 }
 
 /**
@@ -16,6 +18,7 @@ object EventWatcher {
   * @param time
   */
 class EventWatcher(val eventName: String, val time: String) extends Actor with ActorLogging {
+  import EventWatcher._
 
   // TODO kill actor after time
   val options = mutable.Map[String, OddsTracker]()
@@ -41,6 +44,15 @@ class EventWatcher(val eventName: String, val time: String) extends Actor with A
           options += optionName -> nt
         }
       }
+    case GetCurrentOdds(optionName) =>
+      sender ! getCurrentOdds(optionName)
+  }
+
+  private def getCurrentOdds(optionName: String): Double = {
+    options.get(optionName) match {
+      case Some(tracker) => tracker.currentOdds
+      case None => 0.0
+    }
   }
 }
 
