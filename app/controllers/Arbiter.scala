@@ -13,6 +13,7 @@ import services.actors.Exchange.{BookData, BookmakerNames}
 import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.language.postfixOps
 
 // Internal
 import models.sports._
@@ -48,7 +49,7 @@ class Arbiter @Inject() (val database: DBService,
     */
   def matrices(filter: Option[String]) = AsyncStack { implicit request =>
     // test stuff
-    val matrix = new SportBookMatrix("NFL Football")
+    val matrix = new SportMatrix("NFL Football")
     val part1 = "Cardinals"
     val part2 = "Lions"
     val bookName1 = "Nitrogen Sports"
@@ -77,13 +78,13 @@ class Arbiter @Inject() (val database: DBService,
     matrix.addMatchOdds(bookName4, "Red Sox - Tigers", betonline3, betonline4)
 
     val bookNames = matrix.bookNames
-    val matchs = matrix.matchNames
-    val (keya, keyb) = matchs.map{ name =>
+    val keys = matrix.keys
+    val (keya, keyb) = keys.map{ name =>
       val names = name.split(" - ").sorted
       (names(0), names(1))
     }.head
 
-    val odds = matrix.matchOdds(matchs.head).sortBy(_.bookname)
+    val odds = matrix.allOdds(keys.head).sortBy(_.bookname)
     val linea = odds.map(_.a)
     val lineb = odds.map(_.b)
     val sportName = matrix.sportName

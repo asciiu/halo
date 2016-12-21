@@ -5,7 +5,7 @@ import models.sports.SportsBookOdds
 import org.specs2.mutable._
 
 // internal
-import models.sports.OddsMatrix2
+import models.sports.OddsMatrixAB
 import models.sports.{SportsEventLine}
 
 
@@ -16,7 +16,7 @@ class OddsMatrixSpec extends Specification {
 
       val part1 = "World"
       val part2 = "Miami Heat"
-      val gameOddsMatrix = new OddsMatrix2(part1, part2)
+      val gameOddsMatrix = new OddsMatrixAB(part1, part2)
 
       gameOddsMatrix.toString() must beEqualTo(s"$part2 - $part1")
     }
@@ -25,7 +25,7 @@ class OddsMatrixSpec extends Specification {
       val part1 = "Monkeys"
       val part2 = "Tigers"
 
-      val gameOddsMatrix = new OddsMatrix2(part1, part2)
+      val gameOddsMatrix = new OddsMatrixAB(part1, part2)
 
       // should match vs and -
       val isMatch1 = gameOddsMatrix.isEvent(s"$part2 vs $part1")
@@ -39,8 +39,8 @@ class OddsMatrixSpec extends Specification {
       val part1 = "Monkeys"
       val part2 = "Tigers"
 
-      val gameOddsMatrix1 = new OddsMatrix2(part1, part2)
-      val gameOddsMatrix2 = new OddsMatrix2(part2, part1)
+      val gameOddsMatrix1 = new OddsMatrixAB(part1, part2)
+      val gameOddsMatrix2 = new OddsMatrixAB(part2, part1)
 
       gameOddsMatrix1.key must beEqualTo("Monkeys - Tigers")
       gameOddsMatrix1.akey must beEqualTo(part1)
@@ -54,7 +54,7 @@ class OddsMatrixSpec extends Specification {
       val part1 = "Monkeys"
       val part2 = "Tigers"
 
-      val gameOddsMatrix1 = new OddsMatrix2(part1, part2)
+      val gameOddsMatrix1 = new OddsMatrixAB(part1, part2)
 
       gameOddsMatrix1.highestA must be(None)
       gameOddsMatrix1.highestB must be(None)
@@ -65,7 +65,7 @@ class OddsMatrixSpec extends Specification {
       val book1 = "book1"
       val book2 = "book2"
 
-      val matrix = new OddsMatrix2(part1, part2)
+      val matrix = new OddsMatrixAB(part1, part2)
 
       val line1 = SportsEventLine(part1, 1.3)
       val line2 = SportsEventLine(part2, 4.6)

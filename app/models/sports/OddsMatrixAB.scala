@@ -4,20 +4,30 @@ package models.sports
 import scala.collection.mutable
 
 
-class OddsMatrix2(val part1: String, val part2: String) {
+/**
+  * Keeps track of odds between a single pair (optionA vs optionB)
+  * across different bookmakers
+  *
+  * @param optionA the first option
+  * @param optionB the second option
+  */
+class OddsMatrixAB(val optionA: String, val optionB: String) {
 
   private val odds = mutable.MutableList[SportsBookOdds]()
 
-  def akey: String = if (part1 < part2) part1 else part2
-  def bkey: String = if (part1 > part2) part1 else part2
+  // always return the lesser of the options
+  def akey: String = if (optionA < optionB) optionA else optionB
+  // always return the greater of the options
+  def bkey: String = if (optionA > optionB) optionA else optionB
+
   def bookNames: Seq[String] = odds.map(_.bookname)
 
   def allOdds = odds.toList
 
   def key: String = {
     // sort alphabetically
-    if (part1 < part2) s"$part1 - $part2"
-    else s"$part2 - $part1"
+    if (optionA < optionB) s"$optionA - $optionB"
+    else s"$optionB - $optionA"
   }
 
   def highestA: Option[(String, Double)] = {
@@ -44,12 +54,12 @@ class OddsMatrix2(val part1: String, val part2: String) {
     */
   def isEvent(eventName: String): Boolean = {
 
-    if (eventName == s"$part1 vs $part2" ||
-      eventName == s"$part2 vs $part1" ||
-      eventName == s"$part1 V $part2" ||
-      eventName == s"$part2 V $part1" ||
-      eventName == s"$part1 - $part2" ||
-      eventName == s"$part2 - $part1") {
+    if (eventName == s"$optionA vs $optionB" ||
+      eventName == s"$optionB vs $optionA" ||
+      eventName == s"$optionA V $optionB" ||
+      eventName == s"$optionB V $optionA" ||
+      eventName == s"$optionA - $optionB" ||
+      eventName == s"$optionB - $optionA") {
       true
     } else {
       false
