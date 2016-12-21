@@ -1,9 +1,7 @@
 package models.sports.analytics
 
 import java.time.LocalDateTime
-
 import models.sports.{SportsEvent, SportsEventLine, SportsEventPair}
-
 import scala.collection.mutable
 
 /**
@@ -17,21 +15,34 @@ class SportEventOptions(val eventName: String, val time: LocalDateTime) {
   // event name must be separated by hyphen
   require(eventName.contains(" - "))
 
+  // option name mapped to odds over time
+  // e.g. "Golden State Warriors +8" -> ...
   val options = mutable.Map[String, OddsTracker]()
   val parts = eventName.split(" - ")
 
-  def receive(lines: Seq[SportsEventLine]) = {
-    for (line <- lines) {
-      val optionName = line.name
+  /**
+    * update the odds for each option
+    * @param opts
+    * @return a list of event lines options that were updated
+    */
+  def update(opts: Seq[SportsEventLine]): List[SportsEventLine] = {
+    val updated = mutable.ListBuffer[SportsEventLine]()
+
+    for (o <- opts) {
+      // example: "Detriot Lions +3"
+      val optionName = o.name
 
       if (options.contains(optionName)) {
-        val nt = options(optionName)
-        nt.trackMovement(line.odds)
+
+        val changed = options(optionName).trackMovement(o.odds)
+        if (changed) updated.append(o)
+
       } else {
-        val nt = new OddsTracker(optionName, line.odds)
-        options += optionName -> nt
+        options += optionName -> new OddsTracker(optionName, o.odds)
+        updated.append(o)
       }
     }
+    updated.toList
   }
 
   def getCurrentOdds(optionName: String): Double = {
@@ -47,6 +58,8 @@ class SportEventOptions(val eventName: String, val time: LocalDateTime) {
     else false
   }
 
+  // TODO if this was a trait or an actor you could publish these things
+  // accross the event bus and process and tract them in another actor
   def pairs(): List[SportsEventPair] = {
     val allOptions = mutable.ListBuffer(options.keys.toList.sorted:_*)
     val lepair = mutable.ListBuffer[SportsEventPair]()

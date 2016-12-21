@@ -41,15 +41,22 @@ class Bookmaker (val name: String)(implicit ctx: ExecutionContext) extends Actor
     case data: SportsBookData =>
       val sportName = data.sport
 
-      val ref = sports.get (sportName) match {
-        case Some(sport) => sport
+      val sport = sports.get (sportName) match {
+        case Some(s) => s
         case None =>
           //val newRef = context.actorOf(SportBook.props(sportName), name = sportName.replace(" ", ""))
           val newSport = new Sport(sportName)
           sports += sportName -> newSport
           newSport
       }
-      ref.receive(data.events)
+
+      val updated = sport.update(data.events)
+      if (updated.length > 0) {
+        val newData = data.copy(events = updated)
+
+        // publish update to system subscribers
+        context.system.eventStream.publish(newData)
+      }
 
     /**
       * returns all current data for this bookmaker

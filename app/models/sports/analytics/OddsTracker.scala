@@ -22,7 +22,6 @@ class OddsTracker(val optionName: String, val open: Double) {
   def trackMovement(o: Double): Boolean = {
     val lastOdds = odds.last
     if (lastOdds.odds != o) {
-      println(s"$optionName ${lastOdds.odds} to $o")
       odds.append(Stamp(o, LocalDateTime.now()))
       true
     } else {

@@ -37,7 +37,7 @@ class SportEventOptionsSpec extends Specification {
     SportsEventLine("Under 212.5", 1.833),
     SportsEventLine("Under 213", 1.792))
 
-  options.receive(lines)
+  options.update(lines)
   val pairs = options.pairs()
 
 

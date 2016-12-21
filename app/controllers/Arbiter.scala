@@ -22,6 +22,7 @@ import services.DBService
 class Arbiter @Inject() (val database: DBService,
                          val messagesApi: MessagesApi,
                          @Named("exchange") exchange: ActorRef,
+                         @Named("matrix") matrix: ActorRef,
                          implicit val webJarAssets: WebJarAssets)
   extends Controller with AuthConfigTrait with OptionalAuthElement with I18nSupport  {
 

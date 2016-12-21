@@ -78,5 +78,10 @@ class Exchange @Inject()(val database: DBService, conf: Configuration)
       case None => None
     }
   }
+
+  private def compileMatrices() = {
+
+    val booknames = bookmakers.keys.toList
+  }
 }
 
