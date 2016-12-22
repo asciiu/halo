@@ -30,18 +30,22 @@ class OddsMatrixAB(val optionA: String, val optionB: String) {
     else s"$optionB - $optionA"
   }
 
-  def highestA: Option[(String, Double)] = {
+  def highestA: List[(String, Double)] = {
     if (odds.nonEmpty) {
-      val high = odds.sortBy(_.a).reverse.head
-      Some((high.bookname, high.a))
-    } else None
+      val sorted = odds.sortBy(_.a).reverse
+      val high = sorted.head
+      val allHighs = sorted.takeWhile(_.a == high.a)
+      allHighs.map( x => (x.bookname, x.a)).sortBy(_._1).toList
+    } else List[(String, Double)]()
   }
 
-  def highestB: Option[(String, Double)] = {
+  def highestB: List[(String, Double)] = {
     if (odds.nonEmpty) {
-      val high = odds.sortBy(_.b).reverse.head
-      Some((high.bookname, high.b))
-    } else None
+      val sorted = odds.sortBy(_.b).reverse
+      val high = sorted.head
+      val allHighs = sorted.takeWhile(_.b == high.b)
+      allHighs.map( x => (x.bookname, x.b)).sortBy(_._1).toList
+    } else List[(String, Double)]()
   }
 
   override def toString() = key

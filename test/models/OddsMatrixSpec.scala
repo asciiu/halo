@@ -9,9 +9,9 @@ import models.sports.OddsMatrixAB
 import models.sports.{SportsEventLine}
 
 
-class OddsMatrixSpec extends Specification {
+class OddsMatrixABSpec extends Specification {
 
-  "An OddsMatrix2 class" should {
+  "An OddsMatrixAB class" should {
     "alphabetically sort the participants names in toString" in {
 
       val part1 = "World"
@@ -56,8 +56,8 @@ class OddsMatrixSpec extends Specification {
 
       val gameOddsMatrix1 = new OddsMatrixAB(part1, part2)
 
-      gameOddsMatrix1.highestA must be(None)
-      gameOddsMatrix1.highestB must be(None)
+      gameOddsMatrix1.highestA must be(List())
+      gameOddsMatrix1.highestB must be(List())
     }
     "must be valid when inserting odds" in {
       val part1 = "Monkeys"
@@ -82,8 +82,8 @@ class OddsMatrixSpec extends Specification {
       val odds3 = SportsBookOdds(book2, line5, line6)
       matrix.upsertOdds(odds3)
 
-      matrix.highestA must beEqualTo(Some(book2, 4.2))
-      matrix.highestB must beEqualTo(Some(book1, 4.6))
+      matrix.highestA must beEqualTo(List((book2, 4.2)))
+      matrix.highestB must beEqualTo(List((book1, 4.6)))
 
       // there should only be 2 odds
       // 1 for each book

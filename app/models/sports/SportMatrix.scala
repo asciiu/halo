@@ -26,17 +26,17 @@ class SportMatrix(val sportName: String) {
     }
   }
 
-  def highA(key: String): Option[(String, Double)] = {
+  def highA(key: String): List[(String, Double)] = {
     matchMatrix.get(key) match {
       case Some(matrix) => matrix.highestA
-      case None => None
+      case None => List[(String, Double)]()
     }
   }
 
-  def highB(key: String): Option[(String, Double)] = {
+  def highB(key: String): List[(String, Double)] = {
     matchMatrix.get(key) match {
       case Some(matrix) => matrix.highestB
-      case None => None
+      case None => List[(String, Double)]()
     }
   }
 
@@ -46,9 +46,11 @@ class SportMatrix(val sportName: String) {
     for (evt <- data.events) {
       val optionPairs = processPairs(evt)
       val eventName = evt.name
+      // ordered alphabetically so we can guarantee uniques in map keys
+      val normalizeName = evt.name.split(" vs ").sorted.mkString(" vs ")
 
       for (pair <- optionPairs) {
-        val key = s"${evt.name}: ${pair.optionA.name} vs ${pair.optionB.name}"
+        val key = s"${normalizeName}: ${pair.optionA.name} vs ${pair.optionB.name}"
         val odds = SportsBookOdds(data.bookname, pair.optionA, pair.optionB)
 
         matchMatrix.get(key) match {
@@ -99,7 +101,9 @@ class SportMatrix(val sportName: String) {
 
       allOptions.find(_.name == fullOpposite) match {
         case Some(oppositeOpt) =>
-          lepair.append(SportsEventPair(option, oppositeOpt))
+          val (optionA, optionB) = if (option.name < oppositeOpt.name) (option, oppositeOpt) else (oppositeOpt, option)
+
+          lepair.append(SportsEventPair(optionA, optionB))
           // remove the opposite so we don't process it again
           // on next loop
           allOptions.remove(allOptions.indexOf(oppositeOpt))
