@@ -12,12 +12,12 @@ import scala.collection.mutable
 class SportMatrix(val sportName: String) {
 
   // maps a match name to the odds matrix
-  // example match name: Spurs +4 vs Suns -4
+  // example match name: Denver Nuggets vs Los Angeles Clippers: Denver Nuggets +7 vs Los Angeles Clippers -7
   private val matchMatrix = mutable.Map[String, OddsMatrixAB]()
-  private val allBookNames = mutable.ListBuffer[String]()
+  private val allBookNames = mutable.Set[String]()
 
-  def keys = matchMatrix.keys.toList.sorted
-  def bookNames = allBookNames.sorted.toSet
+  def keys = matchMatrix.keys.toSeq.sorted
+  def bookNames = allBookNames.toSeq.sorted
 
   def allOdds(key: String): List[SportsBookOdds] = {
     matchMatrix.get(key) match {
@@ -37,22 +37,6 @@ class SportMatrix(val sportName: String) {
     matchMatrix.get(key) match {
       case Some(matrix) => matrix.highestB
       case None => None
-    }
-  }
-
-  def acceptData(events: Seq[SportsEvent]): Unit = {
-    for (event <- events) {
-      val eventName = event.name
-      val eventTime = event.time
-      val lines = event.lines
-
-      println(s"$eventName $eventTime")
-
-      for (line <- lines) {
-        val lineName = line.name
-        val odds = line.odds
-        println(s"$lineName $odds")
-      }
     }
   }
 
@@ -125,19 +109,19 @@ class SportMatrix(val sportName: String) {
     lepair.toList
   }
 
-  def addMatchOdds(bookName: String, matchName: String, line1: SportsEventLine, line2: SportsEventLine): Unit = {
+  def addMatchOdds(bookName: String, key: String, line1: SportsEventLine, line2: SportsEventLine): Unit = {
     allBookNames += bookName
 
-    if (matchMatrix.contains(matchName)) {
+    if (matchMatrix.contains(key)) {
       val odds = SportsBookOdds(bookName, line1, line2)
-      matchMatrix(matchName).upsertOdds(odds)
+      matchMatrix(key).upsertOdds(odds)
     } else {
       val part1 = line1.name
       val part2 = line2.name
       val oddsMatrix = new OddsMatrixAB(part1, part2)
       val odds = SportsBookOdds(bookName, line1, line2)
       oddsMatrix.upsertOdds(odds)
-      matchMatrix += matchName -> oddsMatrix
+      matchMatrix += key -> oddsMatrix
     }
   }
 }
