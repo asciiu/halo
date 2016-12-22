@@ -20,14 +20,17 @@ class OddsMatrixAB(val optionA: String, val optionB: String) {
   // always return the greater of the options
   def bkey: String = if (optionA > optionB) optionA else optionB
 
-  def bookNames: Seq[String] = odds.map(_.bookname)
+  def bookNames: Seq[String] = odds.map(_.bookname).sorted
 
   def allOdds = odds.toList
 
+  def allOddsA = odds.sortBy(_.bookname).map(_.a)
+  def allOddsB = odds.sortBy(_.bookname).map(_.b)
+
   def key: String = {
     // sort alphabetically
-    if (optionA < optionB) s"$optionA - $optionB"
-    else s"$optionB - $optionA"
+    if (optionA < optionB) s"$optionA vs $optionB"
+    else s"$optionB vs $optionA"
   }
 
   def highestA: List[(String, Double)] = {

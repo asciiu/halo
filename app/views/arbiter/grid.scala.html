@@ -1,35 +1,37 @@
-@(account: Option[Entity[Account]], sportName: String, bookNames: Seq[String], keya: String, keyb: String, linea: List[Double], lineb: List[Double])(implicit webJarAssets: WebJarAssets, messages: Messages)
+@(account: Option[Entity[Account]], matrices: List[(String, models.sports.OddsMatrixAB)])(implicit webJarAssets: WebJarAssets, messages: Messages)
 
 @_template(account) {
     <div class="row">
-        <div>
-            @sportName
-        </div>
-        <div class="medium-12 columns">
-            <table>
-                <thead>
-                    <tr>
-                        <th></th>
-                        @for(name <- bookNames) {
-                            <th>@name</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>@keya</td>
-                        @for(a <- linea) {
-                            <td>@a</td>
-                        }
-                    </tr>
-                    <tr>
-                        <td>@keyb</td>
-                        @for(b <- lineb) {
-                            <td>@b</td>
-                        }
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        @for(event <- matrices) {
+            <div>
+                @event._1
+            </div>
+            <div class="medium-12 columns">
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            @for(name <- event._2.bookNames) {
+                                <th>@name</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@event._2.akey</td>
+                            @for(a <- event._2.allOddsA) {
+                                <td>@a</td>
+                            }
+                        </tr>
+                        <tr>
+                            <td>@event._2.bkey</td>
+                            @for(b <- event._2.allOddsB) {
+                                <td>@b</td>
+                            }
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        }
     </div>
 }

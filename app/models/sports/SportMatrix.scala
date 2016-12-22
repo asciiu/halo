@@ -42,11 +42,11 @@ class SportMatrix(val sportName: String) {
 
   /**
     * TODO
-    * @param key
     * @return
     */
-  def oddsMatrix(key: String): Option[OddsMatrixAB] = {
-    None
+  def gleam(byDate: String): List[(String, OddsMatrixAB)] = {
+    // TODO by date
+    matchMatrix.toList
   }
 
   def updateData(data: SportsBookData) = {
@@ -59,6 +59,7 @@ class SportMatrix(val sportName: String) {
       val normalizeName = evt.name.split(" vs ").sorted.mkString(" vs ")
 
       for (pair <- optionPairs) {
+        // TODO you need the timestamp in the key
         val key = s"${normalizeName}: ${pair.optionA.name} vs ${pair.optionB.name}"
         val odds = SportsBookOdds(data.bookname, pair.optionA, pair.optionB)
 

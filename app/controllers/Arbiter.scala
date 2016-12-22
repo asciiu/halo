@@ -5,11 +5,14 @@ import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
 import javax.inject.{Inject, Named}
+
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{Action, Controller}
 import services.actors.Exchange.{BookData, BookmakerNames}
+import services.actors.Matrix.Gleam
+
 import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -48,48 +51,9 @@ class Arbiter @Inject() (val database: DBService,
     * Should display a view of betting lines with odds for a specific sport.
     */
   def matrices(filter: Option[String]) = AsyncStack { implicit request =>
-    // test stuff
-    val matrix = new SportMatrix("NFL Football")
-    val part1 = "Cardinals"
-    val part2 = "Lions"
-    val bookName1 = "Nitrogen Sports"
-    val matchName = s"$part1 - $part2"
-    val nitroline1 = SportsEventLine(part1, 1.3)
-    val nitroline2 = SportsEventLine(part2, 2.3)
-    matrix.addMatchOdds(bookName1, matchName, nitroline1, nitroline2)
-
-    val bookName2 = "Cloudbet"
-    val cloudbetline1 = SportsEventLine(part1, 3.3)
-    val cloudbetline2 = SportsEventLine(part2, 1.3)
-    matrix.addMatchOdds(bookName2, matchName, cloudbetline1, cloudbetline2)
-
-    val bookName3 = "Betcoin"
-    val betline1 = SportsEventLine(part2, 1.1)
-    val betline2 = SportsEventLine(part1, 2.0)
-    matrix.addMatchOdds(bookName3, matchName, betline1, betline2)
-
-    val bookName4 = "BetOnline"
-    val betonline1 = SportsEventLine(part2, 8.1)
-    val betonline2 = SportsEventLine(part1, 3.0)
-    matrix.addMatchOdds(bookName4, matchName, betonline1, betonline2)
-
-    val betonline3 = SportsEventLine("Tigers", 8.1)
-    val betonline4 = SportsEventLine("Red Sox", 3.0)
-    matrix.addMatchOdds(bookName4, "Red Sox - Tigers", betonline3, betonline4)
-
-    val bookNames = matrix.bookNames
-    val keys = matrix.keys
-    val (keya, keyb) = keys.map{ name =>
-      val names = name.split(" - ").sorted
-      (names(0), names(1))
-    }.head
-
-    val odds = matrix.allOdds(keys.head).sortBy(_.bookname)
-    val linea = odds.map(_.a)
-    val lineb = odds.map(_.b)
-    val sportName = matrix.sportName
-
-    Future.successful(Ok(views.html.arbiter.grid(loggedIn, sportName, bookNames, keya, keyb, linea, lineb)))
+    (matrix ? Gleam(20)).mapTo[List[(String, OddsMatrixAB)]].map { list =>
+      Ok(views.html.arbiter.grid(loggedIn, list.take(20)))
+    }
   }
 
   def bookmaker(bookname: String) = AsyncStack { implicit request =>

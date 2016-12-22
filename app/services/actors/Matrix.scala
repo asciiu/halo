@@ -4,7 +4,7 @@ package services.actors
 import javax.inject.Inject
 
 import akka.actor.{Actor, ActorLogging}
-import models.sports.SportMatrix
+import models.sports.{OddsMatrixAB, SportMatrix}
 import play.api.Configuration
 
 import scala.collection.mutable
@@ -18,6 +18,7 @@ import services.DBService
 
 object Matrix {
 
+  case class Gleam(depth: Int)
 }
 
 /**
@@ -43,9 +44,15 @@ class Matrix @Inject()(val database: DBService, conf: Configuration)
   def receive = {
     case data: SportsBookData =>
       update(data)
+    case Gleam(depth) =>
+      sender ! gleam(depth)
   }
 
-  def update(data: SportsBookData) = {
+  private def gleam(depth: Int): List[(String, OddsMatrixAB)] = {
+    matrices.map(_._2.gleam("")).toList.flatten
+  }
+
+  private def update(data: SportsBookData) = {
     val sportname = data.sport
     val bookname = data.bookname
 
