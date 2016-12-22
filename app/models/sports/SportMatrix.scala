@@ -40,6 +40,15 @@ class SportMatrix(val sportName: String) {
     }
   }
 
+  /**
+    * TODO
+    * @param key
+    * @return
+    */
+  def oddsMatrix(key: String): Option[OddsMatrixAB] = {
+    None
+  }
+
   def updateData(data: SportsBookData) = {
     allBookNames += data.bookname
 

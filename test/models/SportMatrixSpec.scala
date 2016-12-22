@@ -17,8 +17,8 @@ class SportMatrixSpec extends Specification {
           SportsEventLine("Los Angeles Clippers -7",1.786),
           SportsEventLine("Los Angeles Clippers -7.5",1.871),
           SportsEventLine("Los Angeles Clippers -8",1.958),
-          SportsEventLine("Denver Nuggets ML",3.886),
-          SportsEventLine("Los Angeles Clippers ML",1.283),
+          SportsEventLine("Denver Nuggets ML",2.86),
+          SportsEventLine("Los Angeles Clippers ML",1.786),
           SportsEventLine("Over 217.5",1.903),
           SportsEventLine("Over 218",1.958),
           SportsEventLine("Under 217.5",1.939),
@@ -64,9 +64,29 @@ class SportMatrixSpec extends Specification {
       )
     ))
 
+  val bookname3 = "Cloudbet"
+  val data3 = SportsBookData(bookname3, sportname,
+    Seq(
+      SportsEvent("Los Angeles Clippers vs Denver Nuggets", "Tuesday, Dec 20, 2016 8:40 PM",
+        Seq(
+          SportsEventLine("Denver Nuggets ML",3.806),
+          SportsEventLine("Los Angeles Clippers ML",1.183),
+          SportsEventLine("Over 218",1.858),
+          SportsEventLine("Under 218",1.703)
+        )
+      ),
+      SportsEvent("Utah Jazz vs Golden State Warriors","Tuesday, Dec 20, 2016 8:40 PM",
+        Seq(
+          SportsEventLine("Over 209",1.741),
+          SportsEventLine("Under 209",1.777)
+        )
+      )
+    ))
+
   val matrix = new SportMatrix(sportname)
   matrix.updateData(data)
   matrix.updateData(data2)
+  matrix.updateData(data3)
 
   "A SportBookMatrix class" should {
     "have a valid sport name" in {
@@ -76,7 +96,7 @@ class SportMatrixSpec extends Specification {
     "keep tabs on all booknames that are entered" in {
       val bookNames = matrix.bookNames
       // should be alphabetical
-      bookNames must beEqualTo(Seq(bookname2, bookname1))
+      bookNames must beEqualTo(Seq(bookname3, bookname2, bookname1))
     }
     "contain the correct match names" in {
       val keys = List(
@@ -92,19 +112,35 @@ class SportMatrixSpec extends Specification {
       matrix.keys must beEqualTo(keys)
     }
     "contain the correct odds" in {
-      val key = "Denver Nuggets vs Los Angeles Clippers: Denver Nuggets +7 vs Los Angeles Clippers -7"
-      val allOdds = matrix.allOdds(key)
-      allOdds must beEqualTo(List(SportsBookOdds(bookname1,2.096,1.786), SportsBookOdds(bookname2, 2.096, 1.786)))
+      // test 1
+      val key1 = "Denver Nuggets vs Los Angeles Clippers: Denver Nuggets +7 vs Los Angeles Clippers -7"
+      val correctOdds1 = List(
+        SportsBookOdds(bookname1,2.096,1.786),
+        SportsBookOdds(bookname2, 2.096, 1.786)
+      )
+      val allOdds = matrix.allOdds(key1)
+      allOdds must beEqualTo(correctOdds1)
+
+      // test 2
+      val key2 = "Denver Nuggets vs Los Angeles Clippers: Denver Nuggets ML vs Los Angeles Clippers ML"
+      val correctOdds2 = List(
+        SportsBookOdds(bookname1, 2.86, 1.786),
+        SportsBookOdds(bookname2, 3.886, 1.283),
+        SportsBookOdds(bookname3, 3.806, 1.183)
+      )
+
+      val allOdds2 = matrix.allOdds(key2)
+      allOdds2 must beEqualTo(correctOdds2)
     }
     "return highest bookname and odds for option a" in {
       val key = "Denver Nuggets vs Los Angeles Clippers: Denver Nuggets ML vs Los Angeles Clippers ML"
       val matchOdds = matrix.highA(key)
-      matchOdds must beEqualTo(List((bookname2, 3.886), (bookname1, 3.886)))
+      matchOdds must beEqualTo(List((bookname2, 3.886)))
     }
     "return highest bookname and odds for option b" in {
       val key = "Denver Nuggets vs Los Angeles Clippers: Denver Nuggets ML vs Los Angeles Clippers ML"
       val matchOdds = matrix.highB(key)
-      matchOdds must beEqualTo(List((bookname2, 1.283), (bookname1, 1.283)))
+      matchOdds must beEqualTo(List((bookname1, 1.786)))
     }
   }
 }
