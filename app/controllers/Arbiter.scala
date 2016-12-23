@@ -41,7 +41,15 @@ class Arbiter @Inject() (val database: DBService,
         Future.successful(BadRequest(Json.obj("status" ->"KO", "message" -> JsError.toJson(errors))))
       },
       newBook => {
-        exchange ! newBook
+        // we shall normalize the sport names from the books because these sport names
+        // may be labeled differently on various bookmakers sites
+        val sportname = newBook.sport
+        val normalized = sportname match {
+          case "American FootballUSANFL" => "NFL Football"
+          case _ => sportname
+        }
+
+        exchange ! newBook.copy(sport = normalized)
         Future.successful(Ok(Json.obj("status" ->"OK", "message" -> ("Received") )))
       }
     )
