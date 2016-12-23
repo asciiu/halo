@@ -46,6 +46,7 @@ class Arbiter @Inject() (val database: DBService,
         val sportname = newBook.sport
         val normalized = sportname match {
           case "American FootballUSANFL" => "NFL Football"
+          case "Football - USA: NFL" => "NFL Football"
           case _ => sportname
         }
 
