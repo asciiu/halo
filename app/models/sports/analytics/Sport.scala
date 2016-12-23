@@ -23,7 +23,7 @@ class Sport(val sportName: String) {
 
     for (event <- events) {
       // example: Saturday, Dec 24, 2016 11:00 AM
-      val formatter = DateTimeFormatter.ofPattern("EEEE, MMM d, yyyy h:mm a")
+      val formatter = DateTimeFormatter.ofPattern("E, MMM d, yyyy h:mm a")
       //val name = event.name.replace("vs", ":")
       val name = event.name
       val time = event.time

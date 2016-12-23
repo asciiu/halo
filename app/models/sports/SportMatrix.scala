@@ -48,7 +48,7 @@ class SportMatrix(val sportName: String) {
     * @return
     */
   def gleam(byDate: String): List[(String, OddsMatrixAB)] = {
-    val formatter = DateTimeFormatter.ofPattern("EEEE, MMM d, yyyy h:mm a")
+    val formatter = DateTimeFormatter.ofPattern("E, MMM d, yyyy h:mm a")
     val pattern = """(\(\w+.*\))""".r
 
     // purge expired events
