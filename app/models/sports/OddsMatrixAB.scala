@@ -1,6 +1,8 @@
 package models.sports
 
 
+import java.time.LocalDateTime
+
 import scala.collection.mutable
 
 
@@ -14,6 +16,8 @@ import scala.collection.mutable
 class OddsMatrixAB(val optionA: String, val optionB: String) {
 
   private val odds = mutable.MutableList[SportsBookOdds]()
+
+  private var isArb = false
 
   // always return the lesser of the options
   def akey: String = if (optionA < optionB) optionA else optionB
@@ -73,11 +77,33 @@ class OddsMatrixAB(val optionA: String, val optionB: String) {
     }
   }
 
+  def displayArb = {
+    if (isArb == true) {
+      val higha = highestA.head
+      val highb = highestB.head
+      val total = 1 / higha._2 + 1 / highb._2
+
+      println("")
+      println(s"${LocalDateTime.now()}")
+      println(s"$optionA vs $optionB")
+      println(s"${higha._1} - ${higha._2}")
+      println(s"${highb._1} - ${highb._2}")
+      println(s"total: ${total}")
+    }
+  }
+
   def upsertOdds(o: SportsBookOdds): Unit = {
     var bookname = o.bookname
     val index = odds.indexWhere(_.bookname == bookname)
     // if previous odds present update it
     if (index != -1) odds.update(index, o)
     else odds += o
+
+    // arb?
+    val higha = highestA.head
+    val highb = highestB.head
+    val total = 1 / higha._2 + 1 / highb._2
+    if (total < 1.0) isArb = true
+    else isArb = false
   }
 }

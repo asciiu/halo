@@ -67,7 +67,7 @@ class SportMatrix(val sportName: String) {
     matchMatrix.toList
   }
 
-  def updateData(data: SportsBookData) = {
+  def updateData(data: SportsBookData, debug: Boolean = true) = {
     allBookNames += data.bookname
 
     for (evt <- data.events) {
@@ -80,14 +80,19 @@ class SportMatrix(val sportName: String) {
         val key = s"${normalizeName} (${evt.time}) : ${pair.optionA.name} vs ${pair.optionB.name}"
         val odds = SportsBookOdds(data.bookname, pair.optionA, pair.optionB)
 
-        matchMatrix.get(key) match {
+        val matrix = matchMatrix.get(key) match {
           case Some(om) =>
             om.upsertOdds(odds)
+            om
           case None =>
             val newMatrix = new OddsMatrixAB(pair.optionA.name, pair.optionB.name)
             newMatrix.upsertOdds(odds)
             matchMatrix += key -> newMatrix
+            newMatrix
         }
+
+        // TODO remove
+        if (debug) matrix.displayArb
       }
     }
   }

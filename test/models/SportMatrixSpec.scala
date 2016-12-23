@@ -9,7 +9,7 @@ class SportMatrixSpec extends Specification {
   val bookname1 = "Nitrogen Sports"
   val data = SportsBookData(bookname1, sportname,
     Seq(
-      SportsEvent("Denver Nuggets vs Los Angeles Clippers", "Tuesday, Dec 20, 2016 8:40 PM",
+      SportsEvent("Denver Nuggets vs Los Angeles Clippers", "Tue, Dec 20, 2016 8:40 PM",
         Seq(
           SportsEventLine("Denver Nuggets +7",2.096),
           SportsEventLine("Denver Nuggets +7.5",1.987),
@@ -25,7 +25,7 @@ class SportMatrixSpec extends Specification {
           SportsEventLine("Under 218",1.903)
         )
       ),
-      SportsEvent("Utah Jazz vs Golden State Warriors","Tuesday, Dec 20, 2016 8:40 PM",
+      SportsEvent("Utah Jazz vs Golden State Warriors","Tue, Dec 20, 2016 8:40 PM",
         Seq(
           SportsEventLine("Over 209",1.841),
           SportsEventLine("Over 209.5",1.887),
@@ -38,7 +38,7 @@ class SportMatrixSpec extends Specification {
   val bookname2 = "Hobo!"
   val data2 = SportsBookData(bookname2, sportname,
     Seq(
-      SportsEvent("Denver Nuggets vs Los Angeles Clippers", "Tuesday, Dec 20, 2016 8:40 PM",
+      SportsEvent("Denver Nuggets vs Los Angeles Clippers", "Tue, Dec 20, 2016 8:40 PM",
         Seq(
           SportsEventLine("Denver Nuggets +7",2.096),
           SportsEventLine("Denver Nuggets +7.5",1.987),
@@ -54,7 +54,7 @@ class SportMatrixSpec extends Specification {
           SportsEventLine("Under 218",1.903)
         )
       ),
-      SportsEvent("Utah Jazz vs Golden State Warriors","Tuesday, Dec 20, 2016 8:40 PM",
+      SportsEvent("Utah Jazz vs Golden State Warriors","Tue, Dec 20, 2016 8:40 PM",
         Seq(
           SportsEventLine("Over 209",1.841),
           SportsEventLine("Over 209.5",1.887),
@@ -67,7 +67,7 @@ class SportMatrixSpec extends Specification {
   val bookname3 = "Cloudbet"
   val data3 = SportsBookData(bookname3, sportname,
     Seq(
-      SportsEvent("Los Angeles Clippers vs Denver Nuggets", "Tuesday, Dec 20, 2016 8:40 PM",
+      SportsEvent("Los Angeles Clippers vs Denver Nuggets", "Tue, Dec 20, 2016 8:40 PM",
         Seq(
           SportsEventLine("Denver Nuggets ML",3.806),
           SportsEventLine("Los Angeles Clippers ML",1.183),
@@ -75,7 +75,7 @@ class SportMatrixSpec extends Specification {
           SportsEventLine("Under 218",1.703)
         )
       ),
-      SportsEvent("Utah Jazz vs Golden State Warriors","Tuesday, Dec 20, 2016 8:40 PM",
+      SportsEvent("Utah Jazz vs Golden State Warriors","Tue, Dec 20, 2016 8:40 PM",
         Seq(
           SportsEventLine("Over 209",1.741),
           SportsEventLine("Under 209",1.777)
@@ -84,9 +84,9 @@ class SportMatrixSpec extends Specification {
     ))
 
   val matrix = new SportMatrix(sportname)
-  matrix.updateData(data)
-  matrix.updateData(data2)
-  matrix.updateData(data3)
+  matrix.updateData(data, false)
+  matrix.updateData(data2, false)
+  matrix.updateData(data3, false)
 
   "A SportBookMatrix class" should {
     "have a valid sport name" in {
@@ -100,20 +100,20 @@ class SportMatrixSpec extends Specification {
     }
     "contain the correct match names" in {
       val keys = List(
-        "Denver Nuggets vs Los Angeles Clippers (Tuesday, Dec 20, 2016 8:40 PM) : Denver Nuggets +7 vs Los Angeles Clippers -7",
-        "Denver Nuggets vs Los Angeles Clippers (Tuesday, Dec 20, 2016 8:40 PM) : Denver Nuggets +7.5 vs Los Angeles Clippers -7.5",
-        "Denver Nuggets vs Los Angeles Clippers (Tuesday, Dec 20, 2016 8:40 PM) : Denver Nuggets +8 vs Los Angeles Clippers -8",
-        "Denver Nuggets vs Los Angeles Clippers (Tuesday, Dec 20, 2016 8:40 PM) : Denver Nuggets ML vs Los Angeles Clippers ML",
-        "Denver Nuggets vs Los Angeles Clippers (Tuesday, Dec 20, 2016 8:40 PM) : Over 217.5 vs Under 217.5",
-        "Denver Nuggets vs Los Angeles Clippers (Tuesday, Dec 20, 2016 8:40 PM) : Over 218 vs Under 218",
-        "Golden State Warriors vs Utah Jazz (Tuesday, Dec 20, 2016 8:40 PM) : Over 209 vs Under 209",
-        "Golden State Warriors vs Utah Jazz (Tuesday, Dec 20, 2016 8:40 PM) : Over 209.5 vs Under 209.5")
+        "Denver Nuggets vs Los Angeles Clippers (Tue, Dec 20, 2016 8:40 PM) : Denver Nuggets +7 vs Los Angeles Clippers -7",
+        "Denver Nuggets vs Los Angeles Clippers (Tue, Dec 20, 2016 8:40 PM) : Denver Nuggets +7.5 vs Los Angeles Clippers -7.5",
+        "Denver Nuggets vs Los Angeles Clippers (Tue, Dec 20, 2016 8:40 PM) : Denver Nuggets +8 vs Los Angeles Clippers -8",
+        "Denver Nuggets vs Los Angeles Clippers (Tue, Dec 20, 2016 8:40 PM) : Denver Nuggets ML vs Los Angeles Clippers ML",
+        "Denver Nuggets vs Los Angeles Clippers (Tue, Dec 20, 2016 8:40 PM) : Over 217.5 vs Under 217.5",
+        "Denver Nuggets vs Los Angeles Clippers (Tue, Dec 20, 2016 8:40 PM) : Over 218 vs Under 218",
+        "Golden State Warriors vs Utah Jazz (Tue, Dec 20, 2016 8:40 PM) : Over 209 vs Under 209",
+        "Golden State Warriors vs Utah Jazz (Tue, Dec 20, 2016 8:40 PM) : Over 209.5 vs Under 209.5")
 
       matrix.keys must beEqualTo(keys)
     }
     "contain the correct odds" in {
       // test 1
-      val key1 = "Denver Nuggets vs Los Angeles Clippers (Tuesday, Dec 20, 2016 8:40 PM) : Denver Nuggets +7 vs Los Angeles Clippers -7"
+      val key1 = "Denver Nuggets vs Los Angeles Clippers (Tue, Dec 20, 2016 8:40 PM) : Denver Nuggets +7 vs Los Angeles Clippers -7"
       val correctOdds1 = List(
         SportsBookOdds(bookname1,2.096,1.786),
         SportsBookOdds(bookname2, 2.096, 1.786)
@@ -122,7 +122,7 @@ class SportMatrixSpec extends Specification {
       allOdds must beEqualTo(correctOdds1)
 
       // test 2
-      val key2 = "Denver Nuggets vs Los Angeles Clippers (Tuesday, Dec 20, 2016 8:40 PM) : Denver Nuggets ML vs Los Angeles Clippers ML"
+      val key2 = "Denver Nuggets vs Los Angeles Clippers (Tue, Dec 20, 2016 8:40 PM) : Denver Nuggets ML vs Los Angeles Clippers ML"
       val correctOdds2 = List(
         SportsBookOdds(bookname1, 2.86, 1.786),
         SportsBookOdds(bookname2, 3.886, 1.283),
@@ -133,12 +133,12 @@ class SportMatrixSpec extends Specification {
       allOdds2 must beEqualTo(correctOdds2)
     }
     "return highest bookname and odds for option a" in {
-      val key = "Denver Nuggets vs Los Angeles Clippers (Tuesday, Dec 20, 2016 8:40 PM) : Denver Nuggets ML vs Los Angeles Clippers ML"
+      val key = "Denver Nuggets vs Los Angeles Clippers (Tue, Dec 20, 2016 8:40 PM) : Denver Nuggets ML vs Los Angeles Clippers ML"
       val matchOdds = matrix.highA(key)
       matchOdds must beEqualTo(List((bookname2, 3.886)))
     }
     "return highest bookname and odds for option b" in {
-      val key = "Denver Nuggets vs Los Angeles Clippers (Tuesday, Dec 20, 2016 8:40 PM) : Denver Nuggets ML vs Los Angeles Clippers ML"
+      val key = "Denver Nuggets vs Los Angeles Clippers (Tue, Dec 20, 2016 8:40 PM) : Denver Nuggets ML vs Los Angeles Clippers ML"
       val matchOdds = matrix.highB(key)
       matchOdds must beEqualTo(List((bookname1, 1.786)))
     }

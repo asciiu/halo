@@ -7,7 +7,7 @@ import models.sports.analytics.SportEventOptions
 import org.specs2.mutable.Specification
 
 class SportEventOptionsSpec extends Specification {
-  val options = new SportEventOptions("Cleveland Cavaliers - Milwaukee Bucks", LocalDateTime.now())
+  val options = new SportEventOptions("Cleveland Cavaliers vs Milwaukee Bucks", LocalDateTime.now())
 
   val lines = Seq(
     SportsEventLine("Cleveland Cavaliers -4.5", 2.076),
@@ -41,7 +41,7 @@ class SportEventOptionsSpec extends Specification {
   val pairs = options.pairs()
 
 
-  "A SportEentOptionsSpec class" should {
+  "A SportEventOptionsSpec class" should {
     "expire by time" in {
       options.isExpired must beEqualTo(true)
     }
