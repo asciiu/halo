@@ -1,5 +1,8 @@
 package models.sports
 
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 import scala.collection.mutable
 
 /**
@@ -45,7 +48,22 @@ class SportMatrix(val sportName: String) {
     * @return
     */
   def gleam(byDate: String): List[(String, OddsMatrixAB)] = {
-    // TODO by date
+    val formatter = DateTimeFormatter.ofPattern("EEEE, MMM d, yyyy h:mm a")
+    val pattern = """(\(\w+.*\))""".r
+
+    // purge expired events
+    matchMatrix.foreach{ case (key, matrix) =>
+      val str = pattern.findFirstIn(key).getOrElse("")
+
+      if (str.nonEmpty) {
+        val evtTime = LocalDateTime.parse(str.replaceAll("\\(|\\)", ""), formatter)
+
+        if (LocalDateTime.now().isAfter(evtTime)) {
+          matchMatrix.remove(key)
+        }
+      }
+    }
+
     matchMatrix.toList
   }
 
@@ -59,8 +77,7 @@ class SportMatrix(val sportName: String) {
       val normalizeName = evt.name.split(" vs ").sorted.mkString(" vs ")
 
       for (pair <- optionPairs) {
-        // TODO you need the timestamp in the key
-        val key = s"${normalizeName}: ${pair.optionA.name} vs ${pair.optionB.name}"
+        val key = s"${normalizeName} (${evt.time}) : ${pair.optionA.name} vs ${pair.optionB.name}"
         val odds = SportsBookOdds(data.bookname, pair.optionA, pair.optionB)
 
         matchMatrix.get(key) match {

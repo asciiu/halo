@@ -4,7 +4,7 @@
     <div class="row">
         @for(event <- matrices) {
             <div>
-                @event._1
+                @event._1.split(":")(0)
             </div>
             <div class="medium-12 columns">
                 <table>

@@ -23,11 +23,11 @@ class Sport(val sportName: String) {
 
     for (event <- events) {
       // example: Saturday, Dec 24, 2016 11:00 AM
-      val formatter = DateTimeFormatter.ofPattern("EEEE, MMM d, yyyy h:mm a");
-      val name = event.name.replace("vs", "-")
+      val formatter = DateTimeFormatter.ofPattern("EEEE, MMM d, yyyy h:mm a")
+      val name = event.name.replace("vs", ":")
       val time = event.time
       val localDateTime = LocalDateTime.parse(time, formatter)
-      val key = s"$name-$localDateTime".replace(" ", "")
+      val key = s"$name:$localDateTime".replace(" ", "")
 
       val options = eventOptions.get(key) match {
         case Some(bettingOptions) => bettingOptions

@@ -18,7 +18,7 @@ class OddsMatrixABSpec extends Specification {
       val part2 = "Miami Heat"
       val gameOddsMatrix = new OddsMatrixAB(part1, part2)
 
-      gameOddsMatrix.toString() must beEqualTo(s"$part2 - $part1")
+      gameOddsMatrix.toString() must beEqualTo(s"$part2 vs $part1")
     }
     "recognize an event name in different formats'" in {
 
@@ -42,11 +42,11 @@ class OddsMatrixABSpec extends Specification {
       val gameOddsMatrix1 = new OddsMatrixAB(part1, part2)
       val gameOddsMatrix2 = new OddsMatrixAB(part2, part1)
 
-      gameOddsMatrix1.key must beEqualTo("Monkeys - Tigers")
+      gameOddsMatrix1.key must beEqualTo("Monkeys vs Tigers")
       gameOddsMatrix1.akey must beEqualTo(part1)
       gameOddsMatrix1.bkey must beEqualTo(part2)
 
-      gameOddsMatrix2.key must beEqualTo("Monkeys - Tigers")
+      gameOddsMatrix2.key must beEqualTo("Monkeys vs Tigers")
       gameOddsMatrix1.akey must beEqualTo(part1)
       gameOddsMatrix1.bkey must beEqualTo(part2)
     }
