@@ -12,13 +12,13 @@ import scala.collection.mutable
   */
 class SportEventOptions(val eventName: String, val time: LocalDateTime) {
 
-  // event name must be separated by hyphen
-  require(eventName.contains(" - "))
+  // event name must be separated by "vs"
+  require(eventName.contains(" vs "))
 
   // option name mapped to odds over time
   // e.g. "Golden State Warriors +8" -> ...
   val options = mutable.Map[String, OddsTracker]()
-  val parts = eventName.split(" - ")
+  val parts = eventName.split(" vs ")
 
   /**
     * update the odds for each option
