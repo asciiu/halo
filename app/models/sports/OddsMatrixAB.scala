@@ -13,11 +13,13 @@ import scala.collection.mutable
   * @param optionA the first option
   * @param optionB the second option
   */
-class OddsMatrixAB(val optionA: String, val optionB: String) {
+class OddsMatrixAB(val expiration: LocalDateTime, val optionA: String, val optionB: String) {
 
   private val odds = mutable.MutableList[SportsBookOdds]()
 
   private var isArb = false
+
+  def isExpired: Boolean = LocalDateTime.now().isAfter(expiration)
 
   // always return the lesser of the options
   def akey: String = if (optionA < optionB) optionA else optionB

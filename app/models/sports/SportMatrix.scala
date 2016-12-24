@@ -18,6 +18,8 @@ class SportMatrix(val sportName: String) {
   // example match name: Denver Nuggets vs Los Angeles Clippers: Denver Nuggets +7 vs Los Angeles Clippers -7
   private val matchMatrix = mutable.Map[String, OddsMatrixAB]()
   private val allBookNames = mutable.Set[String]()
+  private val formatter = DateTimeFormatter.ofPattern("E, MMM d, yyyy h:mm a")
+
 
   def keys = matchMatrix.keys.toSeq.sorted
   def bookNames = allBookNames.toSeq.sorted
@@ -48,26 +50,25 @@ class SportMatrix(val sportName: String) {
     * @return
     */
   def gleam(byDate: String): List[(String, OddsMatrixAB)] = {
-    val formatter = DateTimeFormatter.ofPattern("E, MMM d, yyyy h:mm a")
+    purgeExpiredData()
+
+    matchMatrix.map { case (key, matrix) =>
+        val fullDate = 
+    }.toList
+  }
+
+  def purgeExpiredData() = {
     val pattern = """(\(\w+.*\))""".r
 
-    // purge expired events
+    // remove all expired events
     matchMatrix.foreach{ case (key, matrix) =>
-      val str = pattern.findFirstIn(key).getOrElse("")
-
-      if (str.nonEmpty) {
-        val evtTime = LocalDateTime.parse(str.replaceAll("\\(|\\)", ""), formatter)
-
-        if (LocalDateTime.now().isAfter(evtTime)) {
-          matchMatrix.remove(key)
-        }
-      }
+      if (matrix.isExpired) matchMatrix.remove(key)
     }
-
-    matchMatrix.toList
   }
 
   def updateData(data: SportsBookData, debug: Boolean = true) = {
+    purgeExpiredData()
+
     allBookNames += data.bookname
 
     for (evt <- data.events) {
@@ -77,7 +78,8 @@ class SportMatrix(val sportName: String) {
       val normalizeName = evt.name.split(" vs ").sorted.mkString(" vs ")
 
       for (pair <- optionPairs) {
-        val key = s"${normalizeName} (${evt.time}) : ${pair.optionA.name} vs ${pair.optionB.name}"
+        val date = evt.time.split(" ").take(4).mkString(" ")
+        val key = s"${normalizeName} ($date) : ${pair.optionA.name} vs ${pair.optionB.name}"
         val odds = SportsBookOdds(data.bookname, pair.optionA, pair.optionB)
 
         val matrix = matchMatrix.get(key) match {
@@ -85,7 +87,7 @@ class SportMatrix(val sportName: String) {
             om.upsertOdds(odds)
             om
           case None =>
-            val newMatrix = new OddsMatrixAB(pair.optionA.name, pair.optionB.name)
+            val newMatrix = new OddsMatrixAB(LocalDateTime.parse(evt.time, formatter), pair.optionA.name, pair.optionB.name)
             newMatrix.upsertOdds(odds)
             matchMatrix += key -> newMatrix
             newMatrix
@@ -145,19 +147,19 @@ class SportMatrix(val sportName: String) {
     lepair.toList
   }
 
-  def addMatchOdds(bookName: String, key: String, line1: SportsEventLine, line2: SportsEventLine): Unit = {
-    allBookNames += bookName
-
-    if (matchMatrix.contains(key)) {
-      val odds = SportsBookOdds(bookName, line1, line2)
-      matchMatrix(key).upsertOdds(odds)
-    } else {
-      val part1 = line1.name
-      val part2 = line2.name
-      val oddsMatrix = new OddsMatrixAB(part1, part2)
-      val odds = SportsBookOdds(bookName, line1, line2)
-      oddsMatrix.upsertOdds(odds)
-      matchMatrix += key -> oddsMatrix
-    }
-  }
+//  def addMatchOdds(bookName: String, key: String, line1: SportsEventLine, line2: SportsEventLine): Unit = {
+//    allBookNames += bookName
+//
+//    if (matchMatrix.contains(key)) {
+//      val odds = SportsBookOdds(bookName, line1, line2)
+//      matchMatrix(key).upsertOdds(odds)
+//    } else {
+//      val part1 = line1.name
+//      val part2 = line2.name
+//      val oddsMatrix = new OddsMatrixAB(part1, part2)
+//      val odds = SportsBookOdds(bookName, line1, line2)
+//      oddsMatrix.upsertOdds(odds)
+//      matchMatrix += key -> oddsMatrix
+//    }
+//  }
 }

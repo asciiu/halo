@@ -28,7 +28,7 @@ class Matrix @Inject()(val database: DBService, conf: Configuration)
                          (implicit ctx: ExecutionContext) extends Actor with ActorLogging {
   import Matrix._
 
-  // e.g. NFL Football -> matrix
+  // e.g. NFL Football -> matrix of events for sport
   val matrices = mutable.Map[String, SportMatrix]()
 
   override def preStart() = {
