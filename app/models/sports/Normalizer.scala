@@ -27,6 +27,7 @@ object Normalizer {
       // SportsBet
       case "Football - USA: NFL" => "NFL Football"
       case "Basketball - USA: NBA" => "NBA Basketball"
+      case "Basketball NBA" => "NBA Basketball"
 
       case _ => sportname
     }
