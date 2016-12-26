@@ -6,7 +6,7 @@ import org.specs2.mutable._
 
 // internal
 import models.sports.OddsMatrixAB
-import models.sports.{SportsEventLine}
+import models.sports.{SportsEventOption}
 
 
 class OddsMatrixABSpec extends Specification {
@@ -67,18 +67,18 @@ class OddsMatrixABSpec extends Specification {
 
       val matrix = new OddsMatrixAB(part1, part2)
 
-      val line1 = SportsEventLine(part1, 1.3)
-      val line2 = SportsEventLine(part2, 4.6)
+      val line1 = SportsEventOption(part1, 1.3)
+      val line2 = SportsEventOption(part2, 4.6)
       val odds1 = SportsBookOdds(book1, line1, line2)
       matrix.upsertOdds(odds1)
 
-      val line3 = SportsEventLine(part2, 3.8)
-      val line4 = SportsEventLine(part1, 1.2)
+      val line3 = SportsEventOption(part2, 3.8)
+      val line4 = SportsEventOption(part1, 1.2)
       val odds2 = SportsBookOdds(book2, line3, line4)
       matrix.upsertOdds(odds2)
 
-      val line5 = SportsEventLine(part2, 3.3)
-      val line6 = SportsEventLine(part1, 4.2)
+      val line5 = SportsEventOption(part2, 3.3)
+      val line6 = SportsEventOption(part1, 4.2)
       val odds3 = SportsBookOdds(book2, line5, line6)
       matrix.upsertOdds(odds3)
 

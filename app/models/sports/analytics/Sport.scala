@@ -39,9 +39,9 @@ class Sport(val sportName: String) {
       }
 
       // get a list of options that were updated
-      val updated = options.update(event.lines)
+      val updated = options.update(event.options)
       if (updated.length > 0) {
-        updatedEvents += event.copy(lines = updated)
+        updatedEvents += event.copy(options = updated)
       }
     }
 

@@ -52,9 +52,7 @@ class SportMatrix(val sportName: String) {
   def gleam(byDate: String): List[(String, OddsMatrixAB)] = {
     purgeExpiredData()
 
-    matchMatrix.map { case (key, matrix) =>
-        val fullDate = 
-    }.toList
+    matchMatrix.toList
   }
 
   def purgeExpiredData() = {
@@ -100,7 +98,7 @@ class SportMatrix(val sportName: String) {
   }
 
   private def processPairs(sportevent: SportsEvent): List[SportsEventPair] = {
-    val opts = sportevent.lines
+    val opts = sportevent.options
     val parts = sportevent.name.split(" vs ")
 
     // TODO need to use time in the keys

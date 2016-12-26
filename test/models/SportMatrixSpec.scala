@@ -1,6 +1,6 @@
 package models
 
-import models.sports.{SportMatrix, SportsBookData, SportsBookOdds, SportsEvent, SportsEventLine}
+import models.sports.{SportMatrix, SportsBookData, SportsBookOdds, SportsEvent, SportsEventOption}
 import org.specs2.mutable.Specification
 
 class SportMatrixSpec extends Specification {
@@ -11,26 +11,26 @@ class SportMatrixSpec extends Specification {
     Seq(
       SportsEvent("Denver Nuggets vs Los Angeles Clippers", "Tue, Dec 20, 2016 8:40 PM",
         Seq(
-          SportsEventLine("Denver Nuggets +7",2.096),
-          SportsEventLine("Denver Nuggets +7.5",1.987),
-          SportsEventLine("Denver Nuggets +8",1.903),
-          SportsEventLine("Los Angeles Clippers -7",1.786),
-          SportsEventLine("Los Angeles Clippers -7.5",1.871),
-          SportsEventLine("Los Angeles Clippers -8",1.958),
-          SportsEventLine("Denver Nuggets ML",2.86),
-          SportsEventLine("Los Angeles Clippers ML",1.786),
-          SportsEventLine("Over 217.5",1.903),
-          SportsEventLine("Over 218",1.958),
-          SportsEventLine("Under 217.5",1.939),
-          SportsEventLine("Under 218",1.903)
+          SportsEventOption("Denver Nuggets +7",2.096),
+          SportsEventOption("Denver Nuggets +7.5",1.987),
+          SportsEventOption("Denver Nuggets +8",1.903),
+          SportsEventOption("Los Angeles Clippers -7",1.786),
+          SportsEventOption("Los Angeles Clippers -7.5",1.871),
+          SportsEventOption("Los Angeles Clippers -8",1.958),
+          SportsEventOption("Denver Nuggets ML",2.86),
+          SportsEventOption("Los Angeles Clippers ML",1.786),
+          SportsEventOption("Over 217.5",1.903),
+          SportsEventOption("Over 218",1.958),
+          SportsEventOption("Under 217.5",1.939),
+          SportsEventOption("Under 218",1.903)
         )
       ),
       SportsEvent("Utah Jazz vs Golden State Warriors","Tue, Dec 20, 2016 8:40 PM",
         Seq(
-          SportsEventLine("Over 209",1.841),
-          SportsEventLine("Over 209.5",1.887),
-          SportsEventLine("Under 209",1.977),
-          SportsEventLine("Under 209.5",1.93)
+          SportsEventOption("Over 209",1.841),
+          SportsEventOption("Over 209.5",1.887),
+          SportsEventOption("Under 209",1.977),
+          SportsEventOption("Under 209.5",1.93)
         )
       )
     ))
@@ -40,26 +40,26 @@ class SportMatrixSpec extends Specification {
     Seq(
       SportsEvent("Denver Nuggets vs Los Angeles Clippers", "Tue, Dec 20, 2016 8:40 PM",
         Seq(
-          SportsEventLine("Denver Nuggets +7",2.096),
-          SportsEventLine("Denver Nuggets +7.5",1.987),
-          SportsEventLine("Denver Nuggets +8",1.903),
-          SportsEventLine("Los Angeles Clippers -7",1.786),
-          SportsEventLine("Los Angeles Clippers -7.5",1.871),
-          SportsEventLine("Los Angeles Clippers -8",1.958),
-          SportsEventLine("Denver Nuggets ML",3.886),
-          SportsEventLine("Los Angeles Clippers ML",1.283),
-          SportsEventLine("Over 217.5",1.903),
-          SportsEventLine("Over 218",1.958),
-          SportsEventLine("Under 217.5",1.939),
-          SportsEventLine("Under 218",1.903)
+          SportsEventOption("Denver Nuggets +7",2.096),
+          SportsEventOption("Denver Nuggets +7.5",1.987),
+          SportsEventOption("Denver Nuggets +8",1.903),
+          SportsEventOption("Los Angeles Clippers -7",1.786),
+          SportsEventOption("Los Angeles Clippers -7.5",1.871),
+          SportsEventOption("Los Angeles Clippers -8",1.958),
+          SportsEventOption("Denver Nuggets ML",3.886),
+          SportsEventOption("Los Angeles Clippers ML",1.283),
+          SportsEventOption("Over 217.5",1.903),
+          SportsEventOption("Over 218",1.958),
+          SportsEventOption("Under 217.5",1.939),
+          SportsEventOption("Under 218",1.903)
         )
       ),
       SportsEvent("Utah Jazz vs Golden State Warriors","Tue, Dec 20, 2016 8:40 PM",
         Seq(
-          SportsEventLine("Over 209",1.841),
-          SportsEventLine("Over 209.5",1.887),
-          SportsEventLine("Under 209",1.977),
-          SportsEventLine("Under 209.5",1.93)
+          SportsEventOption("Over 209",1.841),
+          SportsEventOption("Over 209.5",1.887),
+          SportsEventOption("Under 209",1.977),
+          SportsEventOption("Under 209.5",1.93)
         )
       )
     ))
@@ -69,16 +69,16 @@ class SportMatrixSpec extends Specification {
     Seq(
       SportsEvent("Los Angeles Clippers vs Denver Nuggets", "Tue, Dec 20, 2016 8:40 PM",
         Seq(
-          SportsEventLine("Denver Nuggets ML",3.806),
-          SportsEventLine("Los Angeles Clippers ML",1.183),
-          SportsEventLine("Over 218",1.858),
-          SportsEventLine("Under 218",1.703)
+          SportsEventOption("Denver Nuggets ML",3.806),
+          SportsEventOption("Los Angeles Clippers ML",1.183),
+          SportsEventOption("Over 218",1.858),
+          SportsEventOption("Under 218",1.703)
         )
       ),
       SportsEvent("Utah Jazz vs Golden State Warriors","Tue, Dec 20, 2016 8:40 PM",
         Seq(
-          SportsEventLine("Over 209",1.741),
-          SportsEventLine("Under 209",1.777)
+          SportsEventOption("Over 209",1.741),
+          SportsEventOption("Under 209",1.777)
         )
       )
     ))

@@ -33,7 +33,7 @@ class EventWatcher(val eventName: String, val time: String) extends Actor with A
   }
 
   def receive: Receive = {
-    case lines: Seq[SportsEventLine] =>
+    case lines: Seq[SportsEventOption] =>
       for (line <- lines) {
         val optionName = line.name
 

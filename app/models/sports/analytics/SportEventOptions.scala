@@ -1,7 +1,7 @@
 package models.sports.analytics
 
 import java.time.LocalDateTime
-import models.sports.{SportsEvent, SportsEventLine, SportsEventPair}
+import models.sports.{SportsEvent, SportsEventOption, SportsEventPair}
 import scala.collection.mutable
 
 /**
@@ -25,8 +25,8 @@ class SportEventOptions(val eventName: String, val time: LocalDateTime) {
     * @param opts
     * @return a list of event lines options that were updated
     */
-  def update(opts: Seq[SportsEventLine]): List[SportsEventLine] = {
-    val updated = mutable.ListBuffer[SportsEventLine]()
+  def update(opts: Seq[SportsEventOption]): List[SportsEventOption] = {
+    val updated = mutable.ListBuffer[SportsEventOption]()
 
     for (o <- opts) {
       // example: "Detriot Lions +3"
@@ -84,8 +84,8 @@ class SportEventOptions(val eventName: String, val time: LocalDateTime) {
       val nameB = opposite
       val oddsA = options(nameA).currentOdds
       val oddsB = options(nameB).currentOdds
-      val optionA = SportsEventLine(nameA, oddsA)
-      val optionB = SportsEventLine(nameB, oddsB)
+      val optionA = SportsEventOption(nameA, oddsA)
+      val optionB = SportsEventOption(nameB, oddsB)
       lepair.append(SportsEventPair(optionA, optionB))
       val i = allOptions.indexOf(opposite)
       allOptions.remove(i)
@@ -94,8 +94,8 @@ class SportEventOptions(val eventName: String, val time: LocalDateTime) {
   }
 
   def sportsEvent: SportsEvent = {
-    val lines: Seq[SportsEventLine] = options.map { case (optionName, tracker) =>
-      SportsEventLine(optionName, tracker.currentOdds)
+    val lines: Seq[SportsEventOption] = options.map { case (optionName, tracker) =>
+      SportsEventOption(optionName, tracker.currentOdds)
     }.toSeq.sortBy(_.name)
     SportsEvent(eventName, time.toString, lines)
   }

@@ -29,7 +29,7 @@ class SportBook(val sportName: String) extends Actor with ActorLogging {
       for (event <- events) {
         val name = event.name.replace("vs", "-")
         val time = event.time
-        val lines = event.lines
+        val lines = event.options
         val key = s"$name-$time".replace(" ", "")
 
         val ref = eventRefs.get (key) match {

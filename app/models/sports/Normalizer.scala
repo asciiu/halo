@@ -48,8 +48,8 @@ object Normalizer {
         .mkString(" ")
         .replace(" Vs ", " vs ")
 
-      val options = mutable.ListBuffer[SportsEventLine]()
-      for (option <- event.lines) {
+      val options = mutable.ListBuffer[SportsEventOption]()
+      for (option <- event.options) {
         val optionName = option.name
           .toLowerCase()
           .split(' ')
@@ -59,7 +59,7 @@ object Normalizer {
         options.append(option.copy(name = optionName))
       }
 
-      newEvents.append(event.copy(name = name, lines = options))
+      newEvents.append(event.copy(name = name, options = options))
     }
 
     data.copy(events = newEvents)
