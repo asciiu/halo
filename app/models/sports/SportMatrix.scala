@@ -92,7 +92,7 @@ class SportMatrix(val sportName: String) {
         }
 
         // TODO remove
-        if (debug) matrix.displayArb
+        if (debug) matrix.displayArb(key)
       }
     }
   }

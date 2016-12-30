@@ -53,7 +53,7 @@ class Arbiter @Inject() (val database: DBService,
   def matrices(filter: Option[String]) = AsyncStack { implicit request =>
     (matrix ? Gleam(20)).mapTo[List[(String, OddsMatrixAB)]].map { list =>
       val mlMatrices = list.filter(_._1.endsWith("ML"))
-      Ok(views.html.arbiter.grid(loggedIn, mlMatrices))
+      Ok(views.html.arbiter.grid(loggedIn, list))
     }
   }
 

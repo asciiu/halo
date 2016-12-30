@@ -79,7 +79,7 @@ class OddsMatrixAB(val expiration: LocalDateTime, val optionA: String, val optio
     }
   }
 
-  def displayArb = {
+  def displayArb(eventName: String) = {
     if (isArb == true) {
       val higha = highestA.head
       val highb = highestB.head
@@ -87,9 +87,10 @@ class OddsMatrixAB(val expiration: LocalDateTime, val optionA: String, val optio
 
       println("")
       println(s"${LocalDateTime.now()}")
+      println(eventName)
       println(s"$optionA vs $optionB")
-      println(s"${higha._1} - ${higha._2}")
-      println(s"${highb._1} - ${highb._2}")
+      println(s"$optionA: ${higha._1} - ${higha._2}")
+      println(s"$optionB: ${highb._1} - ${highb._2}")
       println(s"total: ${total}")
     }
   }
