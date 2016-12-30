@@ -12,7 +12,7 @@
                   <div>@event.time</div>
 
                       <table>
-                          @for(option <- event.lines) {
+                          @for(option <- event.options) {
                               <tr><td>@option.name</td><td>@option.odds</td></tr>
                           }
                       </table>

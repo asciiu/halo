@@ -5,6 +5,7 @@ import play.twirl.api.Html
 import models.User
 import services.MailService
 import views.html.mails
+import scala.language.implicitConversions
 
 object Mailer {
 

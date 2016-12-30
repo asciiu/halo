@@ -7,6 +7,7 @@ import play.api.Configuration
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.mailer._
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 // internals
 import utils.ConfigSupport

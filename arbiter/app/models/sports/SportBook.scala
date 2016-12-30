@@ -1,17 +1,24 @@
 package models.sports
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-
 import collection.mutable
 
+import models.sports.EventWatcher.OptionCollection
+
+
+/**
+  * These classes may have been deprecated.
+  * TODO remove these?
+  */
 object SportBook {
   def props(sportName: String) = Props(new SportBook(sportName))
+
+  case class EventCollection(events: Seq[SportsEvent])
 }
 
+
 class SportBook(val sportName: String) extends Actor with ActorLogging {
+  import SportBook._
 
   // maps an event name to an actor that tracks the odds
   private val eventRefs = mutable.Map[String, ActorRef]()
@@ -25,7 +32,7 @@ class SportBook(val sportName: String) extends Actor with ActorLogging {
   }
 
   def receive: Receive = {
-    case events: Seq[SportsEvent] =>
+    case EventCollection(events) =>
       for (event <- events) {
         val name = event.name.replace("vs", "-")
         val time = event.time
@@ -40,7 +47,7 @@ class SportBook(val sportName: String) extends Actor with ActorLogging {
             newRef
         }
 
-        ref ! lines
+        ref ! OptionCollection(lines)
       }
   }
 

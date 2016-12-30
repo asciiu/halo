@@ -10,6 +10,7 @@ import scala.collection.mutable
 object EventWatcher {
   def props(eventName: String, time: String) = Props(new EventWatcher(eventName, time))
 
+  case class OptionCollection(options: Seq[SportsEventOption])
   case class GetCurrentOdds(optionName: String)
 }
 
@@ -33,7 +34,7 @@ class EventWatcher(val eventName: String, val time: String) extends Actor with A
   }
 
   def receive: Receive = {
-    case lines: Seq[SportsEventOption] =>
+    case OptionCollection(lines) =>
       for (line <- lines) {
         val optionName = line.name
 
