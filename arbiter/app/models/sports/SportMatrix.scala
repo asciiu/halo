@@ -21,8 +21,8 @@ class SportMatrix(val sportName: String) {
   private val formatter = DateTimeFormatter.ofPattern("E, MMM d, yyyy h:mm a")
 
 
-  def keys = matchMatrix.keys.toSeq.sorted
-  def bookNames = allBookNames.toSeq.sorted
+  def keys = matchMatrix.keys.toList.sorted
+  def bookNames = allBookNames.toList.sorted
 
   def allOdds(key: String): List[SportsBookOdds] = {
     matchMatrix.get(key) match {
@@ -65,7 +65,8 @@ class SportMatrix(val sportName: String) {
   }
 
   def updateData(data: SportsBookData, debug: Boolean = true) = {
-    purgeExpiredData()
+    // TODO there's a better way this breaks your tests
+    //purgeExpiredData()
 
     allBookNames += data.bookname
 
@@ -144,20 +145,4 @@ class SportMatrix(val sportName: String) {
     }
     lepair.toList
   }
-
-//  def addMatchOdds(bookName: String, key: String, line1: SportsEventLine, line2: SportsEventLine): Unit = {
-//    allBookNames += bookName
-//
-//    if (matchMatrix.contains(key)) {
-//      val odds = SportsBookOdds(bookName, line1, line2)
-//      matchMatrix(key).upsertOdds(odds)
-//    } else {
-//      val part1 = line1.name
-//      val part2 = line2.name
-//      val oddsMatrix = new OddsMatrixAB(part1, part2)
-//      val odds = SportsBookOdds(bookName, line1, line2)
-//      oddsMatrix.upsertOdds(odds)
-//      matchMatrix += key -> oddsMatrix
-//    }
-//  }
 }
