@@ -1,12 +1,15 @@
 package controllers
 
 // external
+import java.time.{LocalDateTime, OffsetDateTime, ZoneOffset}
+
 import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
 import javax.inject.{Inject, Named}
 
 import jp.t2v.lab.play2.auth.OptionalAuthElement
+import common.models.halo.{BookOdds, BookPoint, EventData}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{Action, Controller}
@@ -55,6 +58,34 @@ class Arbiter @Inject() (val database: DBService,
       val mlMatrices = list.filter(_._1.endsWith("ML"))
       Ok(views.html.arbiter.grid(loggedIn, list))
     }
+  }
+
+  def sportMatchData(eventName: String) = AsyncStack { implicit request =>
+    // require name
+    val test = LocalDateTime.now()
+    val seconds = test.toEpochSecond(ZoneOffset.UTC)
+
+    val bookpts = collection.mutable.ListBuffer[BookPoint]()
+    val time = OffsetDateTime.now()
+    (0 to 12).foreach { i =>
+      val t = time.plusMinutes(i * 5)
+      println (t.toString)
+      val newPoint = BookPoint(t.toEpochSecond(), Math.random() + 1, Math.random()+1)
+      bookpts.append(newPoint)
+    }
+    val bookOdds = BookOdds("Nitro", bookpts.toList)
+    val data = EventData(eventName, List(bookOdds))
+
+    // bookname1 with bookname odds for name
+    // bookname2 with bookname odds for name
+    // bookname3 with bookname odds for name
+
+    //Future.successful(Ok(Json.toJson(data)))
+    Future.successful(Ok(upickle.default.write[EventData](data)))
+  }
+
+  def sportmatch(eventName: String) = AsyncStack { implicit request =>
+    Future.successful(Ok(views.html.arbiter.sportmatch(loggedIn, eventName)))
   }
 
   def bookmaker(bookname: String) = AsyncStack { implicit request =>

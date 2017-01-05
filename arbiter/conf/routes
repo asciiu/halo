@@ -23,11 +23,14 @@ GET		/messages  					controllers.RestrictedApplication.messages()
 POST    /messages/add               controllers.RestrictedApplication.addMessage()
 POST    /messages/:id/delete        controllers.RestrictedApplication.deleteMessage(id:Int)
 
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 GET     /webjars/*file              controllers.WebJarAssets.at(file)
 
 
+# ARBITER ROUTES
 POST    /events                     controllers.Arbiter.addEvents()
 GET     /matrices                   controllers.Arbiter.matrices(filter: Option[String])
 GET     /bookmaker                  controllers.Arbiter.bookmaker(bookname: String)
 GET     /bookmaker/names            controllers.Arbiter.bookmakerNames()
+GET     /match                      controllers.Arbiter.sportmatch(name: String)
+GET     /match/odds                 controllers.Arbiter.sportMatchData(name: String)

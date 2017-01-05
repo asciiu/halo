@@ -26,6 +26,7 @@ lazy val arbiterJs = (project in file("arbiterjs"))
 		)
 	)
 	.enablePlugins(ScalaJSPlugin, ScalaJSWeb)
+  .dependsOn(sharedJs)
 
 
 // main backend server for arbiter
@@ -46,6 +47,8 @@ lazy val arbiter = (project in file("arbiter"))
 		  "org.webjars" %% "webjars-play" % "2.5.0",
 		  "org.webjars" % "foundation" % "6.2.3",
 		  "com.typesafe.play" %% "play-mailer" % "5.0.0",
+      "com.vmunier" %% "scalajs-scripts" % "1.0.0",
+      "com.lihaoyi" %%% "upickle" % "0.4.3",
 		  filters,
 		  specs2 % Test
 		),
@@ -54,6 +57,14 @@ lazy val arbiter = (project in file("arbiter"))
 		pipelineStages := Seq(digest, gzip)
 	)
   .enablePlugins(PlayScala, SbtWeb)
+  .dependsOn(sharedJvm)
+
+
+lazy val common = (crossProject.crossType(CrossType.Pure) in file("common"))
+  .settings(commonSettings:_*)
+
+lazy val sharedJvm = common.jvm
+lazy val sharedJs = common.js
 
 
 //to generate models/db/Tables.scala

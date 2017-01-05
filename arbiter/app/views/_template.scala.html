@@ -7,13 +7,15 @@
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>sPork</title>
-        <link href="@routes.Assets.at("img/favicon.png")" rel="shortcut icon">
+        <link href="@routes.Assets.versioned("img/favicon.png")" rel="shortcut icon">
         <link rel='stylesheet' href="@routes.WebJarAssets.at(webJarAssets.locate("foundation.css"))">
-        <link rel='stylesheet' href="@routes.Assets.at("css/templatesite.css")">
+        <link rel='stylesheet' href="@routes.Assets.versioned("css/templatesite.css")">
 
+        @scalajs.html.scripts("arbiterJs", routes.Assets.versioned(_).toString, name => getClass.getResource(s"/public/$name") != null)
         <script type="text/javascript" src="@routes.Application.javascriptRoutes"></script>
         <script type='text/javascript' src='@routes.WebJarAssets.at(webJarAssets.locate("jquery.min.js"))'></script>
         <script type='text/javascript' src='@routes.WebJarAssets.at(webJarAssets.locate("foundation.min.js"))'></script>
+        <script src="https://code.highcharts.com/stock/highstock.js"></script>
         @scripts
     </head>
     <body>

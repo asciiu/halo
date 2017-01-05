@@ -1,0 +1,16 @@
+@(account: Option[Entity[Account]], marketName: String)(implicit webJarAssets: WebJarAssets, messages: Messages)
+
+@scripts = {
+    <script type="text/javascript">
+        $(window).on('load', function() {
+            ArbiterSportMatch().connect()
+        });
+    </script>
+}
+
+
+@_template(account, scripts) {
+<div class="row column">
+    <div class="large-8 columns" id="line-chart"></div>
+</div>
+}
