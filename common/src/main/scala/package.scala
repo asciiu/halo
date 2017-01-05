@@ -2,7 +2,8 @@ package common.models
 
 package object halo {
 
-  case class BookPoint(timestamp: Long, a: Double, b: Double)
-  case class BookOdds(bookname: String, points: List[BookPoint])
-  case class EventData(eventName: String, odds: List[BookOdds])
+  // passed to arbiterJs client from arbiter server
+  case class TimedPoint(timestamp: Long, a: Double, b: Double)
+  case class BookOdds(bookname: String, odds: List[TimedPoint])
+  case class EventData(eventName: String, eventTime: String, books: List[BookOdds])
 }

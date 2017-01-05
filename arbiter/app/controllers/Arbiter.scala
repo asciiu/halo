@@ -9,7 +9,7 @@ import akka.util.Timeout
 import javax.inject.{Inject, Named}
 
 import jp.t2v.lab.play2.auth.OptionalAuthElement
-import common.models.halo.{BookOdds, BookPoint, EventData}
+import common.models.halo.{BookOdds, EventData, TimedPoint}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{Action, Controller}
@@ -60,27 +60,34 @@ class Arbiter @Inject() (val database: DBService,
     }
   }
 
-  def sportMatchData(eventName: String) = AsyncStack { implicit request =>
-    // require name
+
+  /**
+    * TODO remove this shit when working proto.
+    */
+  def mockData(bookname: String): BookOdds =  {
     val test = LocalDateTime.now()
     val seconds = test.toEpochSecond(ZoneOffset.UTC)
 
-    val bookpts = collection.mutable.ListBuffer[BookPoint]()
+    val bookpts = collection.mutable.ListBuffer[TimedPoint]()
     val time = OffsetDateTime.now()
     (0 to 12).foreach { i =>
       val t = time.plusMinutes(i * 5)
-      println (t.toString)
-      val newPoint = BookPoint(t.toEpochSecond(), Math.random() + 1, Math.random()+1)
+      val newPoint = TimedPoint(t.toEpochSecond(), Math.random() + 1, Math.random()+1)
       bookpts.append(newPoint)
     }
-    val bookOdds = BookOdds("Nitro", bookpts.toList)
-    val data = EventData(eventName, List(bookOdds))
+    BookOdds(bookname, bookpts.toList)
+  }
 
-    // bookname1 with bookname odds for name
-    // bookname2 with bookname odds for name
-    // bookname3 with bookname odds for name
 
-    //Future.successful(Ok(Json.toJson(data)))
+  def sportMatchData(eventName: String) = AsyncStack { implicit request =>
+    // TODO read this crap from the proper sportsbooks
+    val nitro = mockData("Nitro")
+    val betcoin = mockData("Betcoin")
+    val cloudbet = mockData("Cloudbet")
+    val eventTime = LocalDateTime.now()
+
+    val data = EventData(eventName, eventTime.toString, List(nitro, betcoin, cloudbet))
+
     Future.successful(Ok(upickle.default.write[EventData](data)))
   }
 

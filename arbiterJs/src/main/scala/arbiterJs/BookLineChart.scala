@@ -1,4 +1,6 @@
-import chart.ClientRoutes
+package arbiterJs
+
+import arbiterJs.chart.ClientRoutes
 import com.highcharts.CleanJsObject
 import com.highcharts.HighchartsUtils._
 import com.highstock.HighstockAliases._
@@ -11,25 +13,30 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
 import scala.scalajs.js.annotation.ScalaJSDefined
+import js.JSConverters._
 
 /**
-  * BookLineChart shall chart the betting odds over time
+  * arbiterJs.BookLineChart shall arbiterJs.chart the betting odds over time
   * for bookmakers that list the same event as a betting option.
   */
 @ScalaJSDefined
-class BookLineChart(data: EventData) extends HighstockConfig {
+class BookLineChart(data: List[Series]) extends HighstockConfig {
   // remove the highcharts credits
   override val credits: Cfg[Credits] = Credits(enabled = false)
   // disable exporting
   override val exporting: Cfg[Exporting] = Exporting(enabled = false)
 
-  override val title: Cfg[Title] = Title(
-    text = data.eventName
-  )
+  // TODO this shall also be removed see below
+  //override val title: Cfg[Title] = Title(
+  //  text = data.eventName
+  //)
 
-  override val subtitle: Cfg[Subtitle] = Subtitle(
-    text = "1 Jan, 2016 4:30pm"
-  )
+  // TODO this time shall be removed because it doesn't make sense
+  // to include the event time on both charts for odds a and b
+  // there will be two charts now
+  //override val subtitle: Cfg[Subtitle] = Subtitle(
+  //  text = data.time
+  //)
 
   override val chart: Cfg[Chart] = Chart(
     zoomType = "x"
@@ -58,6 +65,7 @@ class BookLineChart(data: EventData) extends HighstockConfig {
     )
   )
 
+  // the range selecter shall be disabled
   override val rangeSelector: Cfg[RangeSelector] = new RangeSelector {
     override val buttons: UndefOr[js.Array[js.Any]] = js.Array(
       js.Dynamic.literal(`type` = "hour", count = 1, text = "1H"),
@@ -69,44 +77,43 @@ class BookLineChart(data: EventData) extends HighstockConfig {
     override val enabled: UndefOr[Boolean] = false
   }
 
-  import js.JSConverters._
-  val bookname = data.odds.map(x => (x.bookname, x.points))
-  val seriesD1 = bookname.head._2.map{ p =>
-    SeriesLineData(
-      x = p.timestamp.asInstanceOf[Double],
-      y = p.a) : CleanJsObject[SeriesLineData]
-  }.toArray.toJSArray
+  //val bookname = data.odds.map(x => (x.bookname, x.points))
+  //val seriesD1 = bookname.head._2.map{ p =>
+  //  SeriesLineData(
+  //    x = p.timestamp.asInstanceOf[Double],
+  //    y = p.a) : CleanJsObject[SeriesLineData]
+  //}.toArray.toJSArrayj
 
-  override val series: SeriesCfg = js.Array[AnySeries](
+  val sdata = data.map{ s =>
     SeriesLine (
-      data = seriesD1,
-      name = bookname.head._1,
+      data = s.series,
+      name = s.bookname,
       tooltip = new SeriesLineTooltip {
         override val valueDecimals: UndefOr[Double] = 2
       },
       step = "left",
       lineWidth = 1
-    ),
-    SeriesLine (
-      data = js.Array[js.Array[js.Any]](),
-      name = bookname.head._1,
-      tooltip = new SeriesLineTooltip {
-        override val valueDecimals: UndefOr[Double] = 2
-      },
-      step = "left",
-      lineWidth = 1
-    )
-  )
+    ): CleanJsObject[SeriesLine]
+  }.toArray.toJSArray.asInstanceOf[js.Array[AnySeries]]
+
+  override val series: SeriesCfg = sdata
+  //override val series: SeriesCfg = js.Array[AnySeries](
+  //)
 }
 
 object BookLineChart {
-  def loadSampleData(): Future[js.Any] = {
+
+  /**
+    * Load initial arbiterJs.chart data
+    * @return
+    */
+  def loadData(matchName: String): Future[js.Any] = {
     val promise = Promise[js.Any]()
 
     // pull line data for a specific event.
-    val url = ClientRoutes.controllers.Arbiter.sportMatchData("test").url.asInstanceOf[String]
+    val url = ClientRoutes.controllers.Arbiter.sportMatchData(matchName).url.asInstanceOf[String]
 
-    //val socket = new WebSocket(s"ws://localhost:9000$url")
+    // TODO pull host from config
     val xhr = jQuery.getJSON(s"http://localhost:9000$url", (data: js.Any) ⇒ {
       promise.trySuccess(data)
     })

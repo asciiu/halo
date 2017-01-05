@@ -1,4 +1,4 @@
-package chart
+package arbiterJs.chart
 
 import com.highcharts.CleanJsObject
 import com.highcharts.HighchartsUtils._
@@ -44,7 +44,7 @@ class CandleChart(marketName: String, ledata: js.Array[js.Array[js.Any]]) extend
   var plotRight: Double = 0
 
   def tooltipPositioner = { (labelWidth: Double, labelHeight: Double, point: Object) =>
-    //val chart = api.plotWidth - labelWidth + api.plotLeft,
+    //val arbiterJs.chart = api.plotWidth - labelWidth + api.plotLeft,
     js.Dynamic.literal(
       x = plotRight - labelWidth,
       y = 0

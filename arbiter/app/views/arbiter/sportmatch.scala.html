@@ -3,7 +3,7 @@
 @scripts = {
     <script type="text/javascript">
         $(window).on('load', function() {
-            ArbiterSportMatch().connect()
+            arbiterJs.ArbiterSportMatch().initCharts()
         });
     </script>
 }
@@ -11,6 +11,7 @@
 
 @_template(account, scripts) {
 <div class="row column">
-    <div class="large-8 columns" id="line-chart"></div>
+    <div class="large-8 columns" id="line-arbiterJs.chart-a"></div>
+    <div class="large-8 columns" id="line-arbiterJs.chart-b"></div>
 </div>
 }

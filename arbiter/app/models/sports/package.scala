@@ -1,6 +1,5 @@
 package models
 
-import common.models.halo.{BookOdds, BookPoint, EventData}
 import play.api.libs.json.Json
 
 package object sports {
@@ -34,8 +33,4 @@ package object sports {
   implicit val lineWrite = Json.writes[SportsEventOption]
   implicit val eventWrite = Json.writes[SportsEvent]
   implicit val bookWrites = Json.writes[SportsBookData]
-
-  implicit val bookPointWrite = Json.writes[BookPoint]
-  implicit val bookOddsWrite = Json.writes[BookOdds]
-  implicit val eventDataWrite = Json.writes[EventData]
 }
