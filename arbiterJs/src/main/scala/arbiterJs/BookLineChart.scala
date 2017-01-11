@@ -5,7 +5,6 @@ import com.highcharts.CleanJsObject
 import com.highcharts.HighchartsUtils._
 import com.highstock.HighstockAliases._
 import com.highstock.config._
-import common.models.halo.EventData
 import org.scalajs.dom.ErrorEvent
 import org.scalajs.jquery.jQuery
 
@@ -77,13 +76,6 @@ class BookLineChart(data: List[Series]) extends HighstockConfig {
     override val enabled: UndefOr[Boolean] = false
   }
 
-  //val bookname = data.odds.map(x => (x.bookname, x.points))
-  //val seriesD1 = bookname.head._2.map{ p =>
-  //  SeriesLineData(
-  //    x = p.timestamp.asInstanceOf[Double],
-  //    y = p.a) : CleanJsObject[SeriesLineData]
-  //}.toArray.toJSArrayj
-
   val sdata = data.map{ s =>
     SeriesLine (
       data = s.series,
@@ -97,8 +89,6 @@ class BookLineChart(data: List[Series]) extends HighstockConfig {
   }.toArray.toJSArray.asInstanceOf[js.Array[AnySeries]]
 
   override val series: SeriesCfg = sdata
-  //override val series: SeriesCfg = js.Array[AnySeries](
-  //)
 }
 
 object BookLineChart {
