@@ -7,9 +7,11 @@ import common.models.halo.EventData
 import org.scalajs.jquery.jQuery
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 import js.JSConverters._
+import scala.scalajs.js.JSON
 
 case class Series(bookname: String, series: js.Array[SeriesLineData])
 
@@ -21,12 +23,12 @@ object ArbiterSportMatch {
     //val matchName = jQuery("#match-name").html()
     // init the candle chart
 
-    BookLineChart.loadData("test match").map { raw ⇒
+    BookLineChart.loadData("Lakers vs Heat").map { raw ⇒
       val str =  js.JSON.stringify(raw)
       val data = upickle.default.read[EventData](str)
 
       val eventTime = data.eventTime
-      val eventName = data.eventName
+      val eventName = data.eventName.split(" vs ")
       val seriesData = data.books.map { book =>
         val bookname = book.bookname
         val bookOdds = book.odds
@@ -54,8 +56,8 @@ object ArbiterSportMatch {
       val sa = seriesData.map(_._1)
       val sb = seriesData.map(_._2)
 
-      jQuery("#line-chart-a").highstock(new BookLineChart(sa))
-      jQuery("#line-chart-b").highstock(new BookLineChart(sb))
+      jQuery("#line-chart-a").highstock(new BookLineChart(eventName.head, sa))
+      jQuery("#line-chart-b").highstock(new BookLineChart(eventName.last, sb))
     }
   }
 }

@@ -19,16 +19,16 @@ import js.JSConverters._
   * for bookmakers that list the same event as a betting option.
   */
 @ScalaJSDefined
-class BookLineChart(data: List[Series]) extends HighstockConfig {
+class BookLineChart(participant: String, data: List[Series]) extends HighstockConfig {
   // remove the highcharts credits
   override val credits: Cfg[Credits] = Credits(enabled = false)
   // disable exporting
   override val exporting: Cfg[Exporting] = Exporting(enabled = false)
 
   // TODO this shall also be removed see below
-  //override val title: Cfg[Title] = Title(
-  //  text = data.eventName
-  //)
+  override val title: Cfg[Title] = Title(
+    text = participant
+  )
 
   // TODO this time shall be removed because it doesn't make sense
   // to include the event time on both charts for odds a and b
@@ -53,7 +53,6 @@ class BookLineChart(data: List[Series]) extends HighstockConfig {
 
   override val yAxis: Cfg[YAxis] = YAxis(
     gridLineWidth = 0,
-    title = YAxisTitle(text = "flowbets.com"),
     minorGridLineWidth = 0,
     opposite = false
   )
@@ -84,7 +83,7 @@ class BookLineChart(data: List[Series]) extends HighstockConfig {
         override val valueDecimals: UndefOr[Double] = 2
       },
       step = "left",
-      lineWidth = 1
+      lineWidth = 2
     ): CleanJsObject[SeriesLine]
   }.toArray.toJSArray.asInstanceOf[js.Array[AnySeries]]
 
