@@ -79,7 +79,7 @@ class Arbiter @Inject() (val database: DBService,
   }
 
 
-  def sportMatchData(eventName: String) = AsyncStack { implicit request =>
+  def sportEventOdds(eventName: String) = AsyncStack { implicit request =>
     // TODO read this crap from the proper sportsbooks
     val nitro = mockData("Nitro")
     val betcoin = mockData("Betcoin")

@@ -23,7 +23,7 @@ class Application @Inject()(val database: DBService,
 
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
-        Arbiter.sportMatchData
+        Arbiter.sportEventOdds
       )
     ).as("text/javascript")
   }

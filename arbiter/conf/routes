@@ -33,4 +33,4 @@ GET     /matrices                   controllers.Arbiter.matrices(filter: Option[
 GET     /bookmaker                  controllers.Arbiter.bookmaker(bookname: String)
 GET     /bookmaker/names            controllers.Arbiter.bookmakerNames()
 GET     /match                      controllers.Arbiter.sportmatch(name: String)
-GET     /match/odds                 controllers.Arbiter.sportMatchData(name: String)
+GET     /match/odds                 controllers.Arbiter.sportEventOdds(name: String)
