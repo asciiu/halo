@@ -1,9 +1,11 @@
 package arbiterJs
 
+import arbiterJs.chart.ClientRoutes
 import com.highcharts.HighchartsUtils._
 import com.highcharts.CleanJsObject
 import com.highstock.config.SeriesLineData
 import common.models.halo.EventData
+import org.scalajs.dom.ErrorEvent
 import org.scalajs.jquery.jQuery
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -11,19 +13,20 @@ import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 import js.JSConverters._
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js.JSON
 
 case class Series(bookname: String, series: js.Array[SeriesLineData])
 
 @JSExport
-object ArbiterSportMatch {
+object SportingEvent {
 
   @JSExport
   def initCharts() = {
     //val matchName = jQuery("#match-name").html()
     // init the candle chart
 
-    BookLineChart.loadData("Lakers vs Heat").map { raw ⇒
+    loadData("Lakers vs Heat").map { raw ⇒
       val str =  js.JSON.stringify(raw)
       val data = upickle.default.read[EventData](str)
 
@@ -59,5 +62,24 @@ object ArbiterSportMatch {
       jQuery("#line-chart-a").highstock(new BookLineChart(eventName.head, sa))
       jQuery("#line-chart-b").highstock(new BookLineChart(eventName.last, sb))
     }
+  }
+
+  /**
+    * Load initial chart data for sporting event from server.
+    */
+  private def loadData(matchName: String): Future[js.Any] = {
+    val promise = Promise[js.Any]()
+
+    // pull line data for a specific event.
+    val url = ClientRoutes.controllers.Arbiter.sportEventOdds(matchName).url.asInstanceOf[String]
+
+    // TODO pull host from config
+    val xhr = jQuery.getJSON(s"http://localhost:9000$url", (data: js.Any) ⇒ {
+      promise.trySuccess(data)
+    })
+    xhr.onerror = { e: ErrorEvent ⇒
+      promise.tryFailure(new Exception(e.message))
+    }
+    promise.future
   }
 }

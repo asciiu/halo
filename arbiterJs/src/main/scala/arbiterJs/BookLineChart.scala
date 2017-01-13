@@ -1,22 +1,16 @@
 package arbiterJs
 
-import arbiterJs.chart.ClientRoutes
 import com.highcharts.CleanJsObject
 import com.highcharts.HighchartsUtils._
 import com.highstock.HighstockAliases._
 import com.highstock.config._
-import org.scalajs.dom.ErrorEvent
-import org.scalajs.jquery.jQuery
-
-import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
 import scala.scalajs.js.annotation.ScalaJSDefined
 import js.JSConverters._
 
 /**
-  * arbiterJs.BookLineChart shall arbiterJs.chart the betting odds over time
-  * for bookmakers that list the same event as a betting option.
+  * Displays line movement across different betting exchanges.
   */
 @ScalaJSDefined
 class BookLineChart(participant: String, data: List[Series]) extends HighstockConfig {
@@ -30,7 +24,7 @@ class BookLineChart(participant: String, data: List[Series]) extends HighstockCo
     text = participant
   )
 
-  // TODO this time shall be removed because it doesn't make sense
+  // TODO this tie shall be removed because it doesn't make sense
   // to include the event time on both charts for odds a and b
   // there will be two charts now
   //override val subtitle: Cfg[Subtitle] = Subtitle(
@@ -88,27 +82,4 @@ class BookLineChart(participant: String, data: List[Series]) extends HighstockCo
   }.toArray.toJSArray.asInstanceOf[js.Array[AnySeries]]
 
   override val series: SeriesCfg = sdata
-}
-
-object BookLineChart {
-
-  /**
-    * Load initial arbiterJs.chart data
-    * @return
-    */
-  def loadData(matchName: String): Future[js.Any] = {
-    val promise = Promise[js.Any]()
-
-    // pull line data for a specific event.
-    val url = ClientRoutes.controllers.Arbiter.sportMatchData(matchName).url.asInstanceOf[String]
-
-    // TODO pull host from config
-    val xhr = jQuery.getJSON(s"http://localhost:9000$url", (data: js.Any) ⇒ {
-      promise.trySuccess(data)
-    })
-    xhr.onerror = { e: ErrorEvent ⇒
-      promise.tryFailure(new Exception(e.message))
-    }
-    promise.future
-  }
 }
