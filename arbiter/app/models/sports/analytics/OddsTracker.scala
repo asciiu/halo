@@ -4,11 +4,6 @@ import java.time.{LocalDateTime, ZoneOffset}
 
 import scala.collection.mutable
 
-
-class OddPair(val pairName: String) {
-
-}
-
 /**
   * Keeps track of the movement on odds for a given option name.
   * @param optionName

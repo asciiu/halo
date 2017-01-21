@@ -88,7 +88,7 @@ class SportMatrix(val sportName: String) {
             om
           case None =>
             // increment the event ID
-            val newId = sportingEventIds.lastOption.getOrElse((0, ""))._1 + 1
+            val newId = sportingEventIds.keys.toList.sorted.lastOption.getOrElse(0) + 1
             // track this id with the key name
             sportingEventIds += newId -> key
 

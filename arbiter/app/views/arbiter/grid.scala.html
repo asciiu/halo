@@ -3,7 +3,7 @@
 @_template(account) {
     <div class="row">
         @for(event <- matrices) {
-            <div>
+            <div id=@event._2.eventID>
                 @event._1.split(" : ")(0)
             </div>
             <div class="medium-12 columns">
