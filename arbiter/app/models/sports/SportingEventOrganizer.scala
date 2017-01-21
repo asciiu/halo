@@ -2,7 +2,6 @@ package models.sports
 
 // external
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import models.sports.analytics.Sport
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
@@ -28,7 +27,7 @@ class SportingEventOrganizer(val sportName: String)(implicit ctx: ExecutionConte
   // the bad thing will be the lookups during the receive of SportsBookData
 
   // lookup by eventID
-  val sportingEvents = mutable.Map[Int, SportEvent]()
+  //val sportingEvents = mutable.Map[Int, SportEvent]()
 
   // lookup by eventName
   val sportingEventNames = mutable.Map[String, Int]()

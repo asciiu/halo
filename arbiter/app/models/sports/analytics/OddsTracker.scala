@@ -1,31 +1,34 @@
 package models.sports.analytics
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, ZoneOffset}
 
 import scala.collection.mutable
 
+
+class OddPair(val pairName: String) {
+
+}
 
 /**
   * Keeps track of the movement on odds for a given option name.
   * @param optionName
   * @param open
+  * @param opened timestamp of open time as Long seconds
   */
-class OddsTracker(val optionName: String, val open: Double) {
+class OddsTracker(val optionName: String, val open: Double, val opened: Long) {
 
-  case class Stamp(odds: Double, timestamp: LocalDateTime)
+  case class Stamp(odds: Double, timestamp: Long)
 
   val odds = mutable.ListBuffer[Stamp]()
-  odds.append(Stamp(open, LocalDateTime.now()))
+  odds.append(Stamp(open, opened))
 
   def currentOdds = odds.last.odds
 
   def trackMovement(o: Double): Boolean = {
     val lastOdds = odds.last
-    if (lastOdds.odds != o) {
-      odds.append(Stamp(o, LocalDateTime.now()))
-      true
-    } else {
-      false
-    }
+    val flag = if (lastOdds.odds != o) true else false
+
+    odds.append(Stamp(o, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)))
+    flag
   }
 }

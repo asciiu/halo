@@ -1,7 +1,10 @@
 package models.sports
 
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, ZoneOffset}
+
+import common.models.halo.{BookOdds, TimedPoint}
+import models.sports.analytics.OddsTracker
 
 import scala.collection.mutable
 
@@ -13,9 +16,14 @@ import scala.collection.mutable
   * @param optionA the first option
   * @param optionB the second option
   */
-class OddsMatrixAB(val expiration: LocalDateTime, val optionA: String, val optionB: String) {
+class OddsMatrixAB(val eventID: Int, val expiration: LocalDateTime, val optionA: String, val optionB: String) {
 
-  private val odds = mutable.MutableList[SportsBookOdds]()
+  //private val odds = mutable.MutableList[SportsBookOdds]()
+
+  case class Oddity(optionA: OddsTracker, optionB: OddsTracker)
+
+  // Maps bookname to the book odds
+  private val odds = mutable.Map[String, Oddity]()
 
   private var isArb = false
 
@@ -26,12 +34,21 @@ class OddsMatrixAB(val expiration: LocalDateTime, val optionA: String, val optio
   // always return the greater of the options
   def bkey: String = if (optionA > optionB) optionA else optionB
 
-  def bookNames: Seq[String] = odds.map(_.bookname).sorted
+  def bookNames: Seq[String] = odds.keys.toSeq
 
-  def allOdds = odds.toList
+  /**
+    * All the latest odds
+    * @return list of SportBookOdds
+    */
+  def allOdds = {
+    odds.map {
+      case (bookname, oddity) =>
+        SportsBookOdds(bookname, oddity.optionA.currentOdds, oddity.optionB.currentOdds)
+    }.toList
+  }
 
-  def allOddsA = odds.sortBy(_.bookname).map(_.a)
-  def allOddsB = odds.sortBy(_.bookname).map(_.b)
+  def allOddsA = allOdds.sortBy(_.bookname).map(_.a)
+  def allOddsB = allOdds.sortBy(_.bookname).map(_.b)
 
   def key: String = {
     // sort alphabetically
@@ -41,19 +58,19 @@ class OddsMatrixAB(val expiration: LocalDateTime, val optionA: String, val optio
 
   def highestA: List[(String, Double)] = {
     if (odds.nonEmpty) {
-      val sorted = odds.sortBy(_.a).reverse
+      val sorted = allOdds.sortBy(_.a).reverse
       val high = sorted.head
       val allHighs = sorted.takeWhile(_.a == high.a)
-      allHighs.map( x => (x.bookname, x.a)).sortBy(_._1).toList
+      allHighs.map( x => (x.bookname, x.a)).sortBy(_._1)
     } else List[(String, Double)]()
   }
 
   def highestB: List[(String, Double)] = {
     if (odds.nonEmpty) {
-      val sorted = odds.sortBy(_.b).reverse
+      val sorted = allOdds.sortBy(_.b).reverse
       val high = sorted.head
       val allHighs = sorted.takeWhile(_.b == high.b)
-      allHighs.map( x => (x.bookname, x.b)).sortBy(_._1).toList
+      allHighs.map( x => (x.bookname, x.b)).sortBy(_._1)
     } else List[(String, Double)]()
   }
 
@@ -81,32 +98,48 @@ class OddsMatrixAB(val expiration: LocalDateTime, val optionA: String, val optio
 
   def displayArb(eventName: String) = {
     if (isArb == true) {
-      val higha = highestA.head
-      val highb = highestB.head
-      val total = 1 / higha._2 + 1 / highb._2
-
-      println("")
-      println(s"${LocalDateTime.now()}")
-      println(eventName)
-      println(s"$optionA vs $optionB")
-      println(s"$optionA: ${higha._1} - ${higha._2}")
-      println(s"$optionB: ${highb._1} - ${highb._2}")
-      println(s"total: ${total}")
+//      val higha = highestA.head
+//      val highb = highestB.head
+//      val total = 1 / higha._2 + 1 / highb._2
+//
+//      println("")
+//      println(s"${LocalDateTime.now()}")
+//      println(eventName)
+//      println(s"$optionA vs $optionB")
+//      println(s"$optionA: ${higha._1} - ${higha._2}")
+//      println(s"$optionB: ${highb._1} - ${highb._2}")
+//      println(s"total: ${total}")
     }
   }
 
   def upsertOdds(o: SportsBookOdds): Unit = {
-    var bookname = o.bookname
-    val index = odds.indexWhere(_.bookname == bookname)
-    // if previous odds present update it
-    if (index != -1) odds.update(index, o)
-    else odds += o
+    // if there are no odds trackers for this bookname
+    odds.get(o.bookname) match {
+      case Some(oddity) =>
+        oddity.optionA.trackMovement(o.a)
+        oddity.optionB.trackMovement(o.b)
+      case None =>
+        val opened = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        val oA = new OddsTracker(optionA, o.a, opened)
+        val oB = new OddsTracker(optionB, o.b, opened)
+        odds += o.bookname -> Oddity(oA, oB)
+    }
 
-    // arb?
-    val higha = highestA.head
-    val highb = highestB.head
-    val total = 1 / higha._2 + 1 / highb._2
-    if (total < 1.0) isArb = true
-    else isArb = false
+    //val index = odds.indexWhere(_.bookname == bookname)
+
+    //// TODO track odds over time??
+    //// if previous odds present update it
+    //if (index != -1) {
+    //  odds.update(index, o)
+    //} else {
+    //  odds += o
+    //}
+
+    //// arb?
+    //val higha = highestA.head
+    //val highb = highestB.head
+    //val total = 1 / higha._2 + 1 / highb._2
+    //if (total < 1.0) isArb = true
+    //else isArb = false
   }
 }

@@ -1,7 +1,9 @@
 package models.sports.analytics
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, ZoneOffset}
+
 import models.sports.{SportsEvent, SportsEventOption, SportsEventPair}
+
 import scala.collection.mutable
 
 /**
@@ -38,7 +40,8 @@ class SportEventOptions(val eventName: String, val time: LocalDateTime) {
         if (changed) updated.append(o)
 
       } else {
-        options += optionName -> new OddsTracker(optionName, o.odds)
+        val opened = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        options += optionName -> new OddsTracker(optionName, o.odds, opened)
         updated.append(o)
       }
     }

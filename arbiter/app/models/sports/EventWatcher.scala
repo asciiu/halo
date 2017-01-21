@@ -1,6 +1,6 @@
 package models.sports
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, ZoneOffset}
 
 import akka.actor.{Actor, ActorLogging, Props}
 import models.sports.analytics.OddsTracker
@@ -42,7 +42,8 @@ class EventWatcher(val eventName: String, val time: String) extends Actor with A
           val nt = options(optionName)
           nt.trackMovement(line.odds)
         } else {
-          val nt = new OddsTracker(optionName, line.odds)
+          val opened = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+          val nt = new OddsTracker(optionName, line.odds, opened)
           options += optionName -> nt
         }
       }

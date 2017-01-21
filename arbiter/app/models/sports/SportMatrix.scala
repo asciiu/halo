@@ -2,7 +2,6 @@ package models.sports
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
 import scala.collection.mutable
 
 /**
@@ -20,6 +19,8 @@ class SportMatrix(val sportName: String) {
   private val allBookNames = mutable.Set[String]()
   private val formatter = DateTimeFormatter.ofPattern("E, MMM d, yyyy h:mm a")
 
+  // supports lookups by eventID
+  private val sportingEventIds = mutable.Map[Int, String]()
 
   def keys = matchMatrix.keys.toList.sorted
   def bookNames = allBookNames.toList.sorted
@@ -86,7 +87,12 @@ class SportMatrix(val sportName: String) {
             om.upsertOdds(odds)
             om
           case None =>
-            val newMatrix = new OddsMatrixAB(LocalDateTime.parse(evt.time, formatter), pair.optionA.name, pair.optionB.name)
+            // increment the event ID
+            val newId = sportingEventIds.lastOption.getOrElse((0, ""))._1 + 1
+            // track this id with the key name
+            sportingEventIds += newId -> key
+
+            val newMatrix = new OddsMatrixAB(newId, LocalDateTime.parse(evt.time, formatter), pair.optionA.name, pair.optionB.name)
             newMatrix.upsertOdds(odds)
             matchMatrix += key -> newMatrix
             newMatrix
