@@ -41,7 +41,7 @@ class Arbiter @Inject() (val database: DBService,
         Future.successful(BadRequest(Json.obj("status" ->"KO", "message" -> JsError.toJson(errors))))
       },
       newBook => {
-        coordinator ! Normalizer.process(newBook)
+        matrix ! Normalizer.process(newBook)
         Future.successful(Ok(Json.obj("status" ->"OK", "message" -> ("Received") )))
       }
     )

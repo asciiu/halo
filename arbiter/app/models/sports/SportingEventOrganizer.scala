@@ -24,7 +24,15 @@ class SportingEventOrganizer(val sportName: String)(implicit ctx: ExecutionConte
 
   // maps an event name to an object that manages the event
   //val sports = mutable.Map[String, ActorRef]()
-  val sportingEvents = mutable.Map[String, Sport]()
+  // thought: should you map eventID to a SportEvent object?
+  // the bad thing will be the lookups during the receive of SportsBookData
+
+  // lookup by eventID
+  val sportingEvents = mutable.Map[Int, SportEvent]()
+
+  // lookup by eventName
+  val sportingEventNames = mutable.Map[String, Int]()
+
 
   override def preStart() = {
     log.info(s"Started ${self.path}")
@@ -34,10 +42,29 @@ class SportingEventOrganizer(val sportName: String)(implicit ctx: ExecutionConte
     log.info(s"Stopped ${self.path}")
   }
 
+
   def receive = {
     case data: SportsBookData =>
       val bookName = data.bookname
       val events = data.events
+
+      // update each event
+      for (event <- events) {
+        val eventName = event.name
+        val normalizeName = event.name.split(" vs ").sorted.mkString(" vs ")
+
+        //sportingEventNames.find(eventName)
+
+        println(eventName)
+
+
+        // sport event shall have an id and a name
+
+        // sport event should have an object that keeps track of the
+        // different odds
+
+        // each odds should be tracked over time
+      }
 
       //val sport = sportingEvents.get (sportName) match {
       //  case Some(s) => s
@@ -57,8 +84,8 @@ class SportingEventOrganizer(val sportName: String)(implicit ctx: ExecutionConte
       //}
   }
 
-  private def allData(): List[SportsData] = {
-    sportingEvents.values.map(_.sportData).toList
-  }
+  //private def allData(): List[SportsData] = {
+  //  sportingEvents.values.map(_.sportData).toList
+  //}
 }
 
