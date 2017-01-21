@@ -2,85 +2,81 @@ package services.actors
 
 // external
 import akka.actor.{Actor, ActorLogging, ActorRef}
-import javax.inject.Inject
-
 import akka.util.Timeout
-import models.sports.Bookmaker.SendAllData
-import models.sports.SportsData
+import javax.inject.Inject
 import play.api.Configuration
-
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 import scala.language.postfixOps
 import scala.concurrent.duration._
 
 // internal
-import models.sports.Bookmaker
-import models.sports.{ SportsBookData, SportsBookOdds }
+import models.sports.SportingEventOrganizer
+import models.sports.SportsBookData
 import services.DBService
 
 
-object Exchange {
-
-  case object BookmakerNames
-  case class BookData(bookname: String)
+object EventCoordinator {
+  case object AllSportNames
 }
 /**
-  * This actor is reponsible for managing all sports books.
+  * This actor will coordinate SportsBookData to appropriate child actors that
+  * will manage events for the sport.
   */
-class Exchange @Inject()(val database: DBService, conf: Configuration)
-                   (implicit ctx: ExecutionContext) extends Actor with ActorLogging {
+class EventCoordinator @Inject()(val database: DBService, conf: Configuration)
+                                (implicit ctx: ExecutionContext) extends Actor with ActorLogging {
 
-  import Exchange._
+  import EventCoordinator._
 
-  // maps bookmaker name to actor that persists the bookmaker data
-  val bookmakers = mutable.Map[String, ActorRef]()
-  implicit val timeout = Timeout(5 seconds)
+  // maps sport name to an actor that manages the sport's data
+  // sportname example: NBA Basketball
+  val sportingEvents = mutable.Map[String, ActorRef]()
 
   override def preStart() = {
-    log.info("Started exchanger")
+    log.info("Started coordinator")
   }
 
   override def postStop() = {
-    log.info("Stopped exchanger")
+    log.info("Stopped coordinator")
   }
 
   def receive = {
     case sportsBookData: SportsBookData =>
-      val bookname = sportsBookData.bookname
-
-      val ref = bookmakers.get(bookname) match {
-        case Some(maker) => maker
-        case None =>
-          val nef = context.actorOf(Bookmaker.props(bookname), name = bookname.replace(" ", ""))
-          bookmakers += bookname -> nef
-          nef
-      }
-      ref ! sportsBookData
-
-    case BookData(bookname) =>
-      bookactor(bookname) match {
-        case Some(actor) => actor ! SendAllData(sender)
-        case None => sender ! List[SportsData]()
-      }
+      coordinateSportBookData(sportsBookData)
 
     /**
-      * returns a list of strings
+      * returns List[String] of sport names
       */
-    case BookmakerNames =>
-      sender ! bookmakers.keys.toList
+    case AllSportNames =>
+      sender ! sportingEvents.keys.toList
   }
 
-  private def bookactor(bookname: String): Option[ActorRef] = {
-    bookmakers.get(bookname) match {
-      case Some(maker) => Some(maker)
+
+  /**
+    * Coordinate received SportBookData to the appropriate actor
+    * that manages the sport.
+    *
+    * @param sportsBookData
+    */
+  def coordinateSportBookData(sportsBookData: SportsBookData) = {
+    val sportname = sportsBookData.sport
+
+    val actor = sportingEvents.get(sportname) match {
+      case Some(maker) => maker
+      case None =>
+        // instantiate new actor to handle sport data
+        val nef = context.actorOf(SportingEventOrganizer.props(sportname), name = sportname.replace(" ", ""))
+        sportingEvents += sportname -> nef
+        nef
+    }
+    actor ! sportsBookData
+  }
+
+  private def leactor(sportName: String): Option[ActorRef] = {
+    sportingEvents.get(sportName) match {
+      case Some(actor) => Some(actor)
       case None => None
     }
-  }
-
-  private def compileMatrices() = {
-
-    val booknames = bookmakers.keys.toList
   }
 }
 
