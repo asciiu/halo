@@ -37,7 +37,6 @@ class Exchange @Inject()(val database: DBService, conf: Configuration)
   val bookmakers = mutable.Map[String, ActorRef]()
   implicit val timeout = Timeout(5 seconds)
 
-
   override def preStart() = {
     log.info("Started exchanger")
   }
