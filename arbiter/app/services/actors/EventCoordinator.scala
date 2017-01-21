@@ -62,7 +62,7 @@ class EventCoordinator @Inject()(val database: DBService, conf: Configuration)
     val sportname = sportsBookData.sport
 
     val actor = sportingEvents.get(sportname) match {
-      case Some(maker) => maker
+      case Some(sactor) => sactor
       case None =>
         // instantiate new actor to handle sport data
         val nef = context.actorOf(SportingEventOrganizer.props(sportname), name = sportname.replace(" ", ""))

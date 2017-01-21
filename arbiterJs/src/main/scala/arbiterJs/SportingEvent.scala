@@ -22,11 +22,11 @@ case class Series(bookname: String, series: js.Array[SeriesLineData])
 object SportingEvent {
 
   @JSExport
-  def initCharts() = {
+  def initCharts(eventID: Int) = {
     //val matchName = jQuery("#match-name").html()
     // init the candle chart
 
-    loadData("Lakers vs Heat").map { raw ⇒
+    loadData(eventID).map { raw ⇒
       val str =  js.JSON.stringify(raw)
       val data = upickle.default.read[EventData](str)
 
@@ -67,11 +67,11 @@ object SportingEvent {
   /**
     * Load initial chart data for sporting event from server.
     */
-  private def loadData(matchName: String): Future[js.Any] = {
+  private def loadData(eventID: Int): Future[js.Any] = {
     val promise = Promise[js.Any]()
 
     // pull line data for a specific event.
-    val url = ClientRoutes.controllers.Arbiter.sportEventOdds(matchName).url.asInstanceOf[String]
+    val url = ClientRoutes.controllers.Arbiter.sportEventOdds(eventID).url.asInstanceOf[String]
 
     // TODO pull host from config
     val xhr = jQuery.getJSON(s"http://localhost:9000$url", (data: js.Any) ⇒ {

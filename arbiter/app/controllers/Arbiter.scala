@@ -76,14 +76,14 @@ class Arbiter @Inject() (val database: DBService,
   }
 
 
-  def sportEventOdds(eventName: String) = AsyncStack { implicit request =>
+  def sportEventOdds(eventID: Int) = AsyncStack { implicit request =>
     // TODO read this crap from the proper sportsbooks
     val nitro = mockData("Nitro")
     val betcoin = mockData("Betcoin")
     val cloudbet = mockData("Cloudbet")
     val eventTime = LocalDateTime.now()
 
-    val data = EventData(eventName, eventTime.toString, List(nitro, betcoin, cloudbet))
+    val data = EventData(eventID.toString, eventTime.toString, List(nitro, betcoin, cloudbet))
 
     Future.successful(Ok(upickle.default.write[EventData](data)))
   }
