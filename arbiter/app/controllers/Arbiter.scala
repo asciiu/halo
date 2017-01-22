@@ -76,6 +76,11 @@ class Arbiter @Inject() (val database: DBService,
   }
 
 
+  /**
+    * All odds across mutiple books for a single event.
+    * @param eventID
+    * @return json EventData object
+    */
   def sportEventOdds(eventID: Int) = AsyncStack { implicit request =>
     // TODO read this crap from the proper sportsbooks
     val nitro = mockData("Nitro")
