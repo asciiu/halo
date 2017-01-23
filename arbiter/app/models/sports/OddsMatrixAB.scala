@@ -40,7 +40,7 @@ class OddsMatrixAB(val eventID: Int, val expiration: LocalDateTime, val optionA:
     * All the latest odds
     * @return list of SportBookOdds
     */
-  def allOdds = {
+  def allOdds: List[SportsBookOdds] = {
     odds.map {
       case (bookname, oddity) =>
         SportsBookOdds(bookname, oddity.optionA.currentOdds, oddity.optionB.currentOdds)

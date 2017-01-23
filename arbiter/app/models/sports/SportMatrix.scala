@@ -2,7 +2,18 @@ package models.sports
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+
 import scala.collection.mutable
+
+
+object SportMatrix {
+  def props(sportName: String) = Props(new SportMatrix(sportName))
+
+  case class SendAllEvents(out: ActorRef)
+  case class SendEventOdds(eventID: Int, out: ActorRef)
+}
 
 /**
   * Keeps track of odds matrix for events that fall under
@@ -11,7 +22,8 @@ import scala.collection.mutable
   *
   * @param sportName
   */
-class SportMatrix(val sportName: String) {
+class SportMatrix(val sportName: String) extends Actor with ActorLogging {
+  import SportMatrix._
 
   // maps a match name to the odds matrix
   // example match name: Denver Nuggets vs Los Angeles Clippers: Denver Nuggets +7 vs Los Angeles Clippers -7
@@ -44,6 +56,20 @@ class SportMatrix(val sportName: String) {
       case Some(matrix) => matrix.highestB
       case None => List[(String, Double)]()
     }
+  }
+
+  override def receive = {
+    case data: SportsBookData => updateData(data)
+    case SendAllEvents(out) =>
+      out ! gleam("")
+
+    case SendEventOdds(eventID, out) =>
+      sportingEventIds.get(eventID) match {
+        case Some(key) =>
+          val oddsm = matchMatrix(key)
+          out ! oddsm.allOdds
+        case None =>
+      }
   }
 
   /**

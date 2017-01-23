@@ -6,10 +6,13 @@ import akka.pattern.ask
 import akka.util.Timeout
 import java.time.{LocalDateTime, OffsetDateTime, ZoneOffset}
 import javax.inject.{Inject, Named}
+
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{Action, Controller}
+import services.actors.Matrix.{AllEvents, EventOdds}
+
 import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -51,8 +54,9 @@ class Arbiter @Inject() (val database: DBService,
     * Should display a view of betting lines with odds for a specific sport.
     */
   def matrices(filter: Option[String]) = AsyncStack { implicit request =>
-    (matrix ? Gleam(20)).mapTo[List[(String, OddsMatrixAB)]].map { list =>
-      val mlMatrices = list.filter(_._1.endsWith("ML"))
+    (matrix ? AllEvents(filter)).mapTo[List[(String, OddsMatrixAB)]].map { list =>
+      // show ML only?
+      //val mlMatrices = list.filter(_._1.endsWith("ML"))
       Ok(views.html.arbiter.grid(loggedIn, list))
     }
   }
@@ -82,6 +86,12 @@ class Arbiter @Inject() (val database: DBService,
     * @return json EventData object
     */
   def sportEventOdds(eventID: Int) = AsyncStack { implicit request =>
+    // get odds from matrix
+    (matrix ? EventOdds(eventID)).mapTo[List[SportsBookOdds]].map { result =>
+      println(result)
+    }
+
+
     // TODO read this crap from the proper sportsbooks
     val nitro = mockData("Nitro")
     val betcoin = mockData("Betcoin")
