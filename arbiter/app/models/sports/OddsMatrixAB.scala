@@ -51,8 +51,8 @@ class OddsMatrixAB(val eventID: String, val expiration: LocalDateTime, val optio
     EventData(key, expiration.toString, allOdds)
   }
 
-  def allOddsA = allOdds.sortBy(_.bookname).map(_.a)
-  def allOddsB = allOdds.sortBy(_.bookname).map(_.b)
+  def allOddsA = allOdds.map(_.a)
+  def allOddsB = allOdds.map(_.b)
 
   def key: String = {
     // sort alphabetically
