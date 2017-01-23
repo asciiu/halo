@@ -16,7 +16,7 @@ import scala.collection.mutable
   * @param optionA the first option
   * @param optionB the second option
   */
-class OddsMatrixAB(val eventID: Int, val expiration: LocalDateTime, val optionA: String, val optionB: String) {
+class OddsMatrixAB(val eventID: String, val expiration: LocalDateTime, val optionA: String, val optionB: String) {
 
   //private val odds = mutable.MutableList[SportsBookOdds]()
 

@@ -5,7 +5,7 @@ import javax.inject.Inject
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import models.sports.SportMatrix.{SendAllEvents, SendEventOdds}
-import models.sports.{OddsMatrixAB, SportMatrix}
+import models.sports.{OddsMatrixAB, SportMatrix, SportsBookOdds}
 import play.api.Configuration
 
 import scala.collection.mutable
@@ -21,7 +21,7 @@ object Matrix {
 
   case class Gleam(depth: Int)
   case class AllEvents(filter: Option[String])
-  case class EventOdds(eventID: Int)
+  case class EventOdds(eventID: String)
 }
 
 /**
@@ -72,12 +72,14 @@ class Matrix @Inject()(val database: DBService, conf: Configuration)
 
   }
 
-//  private def gleam(depth: Int): List[(String, OddsMatrixAB)] = {
-//    //matrices.map(_._2.gleam("")).toList.flatten
-//  }
-
-  private def getEventOdds(eventID: Int) = {
-    matrices.foreach{ case (sportname, actor) => actor ! SendEventOdds(eventID, sender) }
+  private def getEventOdds(eventID: String) = {
+    val prefix = eventID.substring(0, 3)
+    matrices.keys.find( _.startsWith(prefix)) match {
+      case Some(key) =>
+        matrices(key) ! SendEventOdds(eventID, sender)
+      case None =>
+        sender ! List[SportsBookOdds]()
+    }
   }
 
   private def update(data: SportsBookData) = {

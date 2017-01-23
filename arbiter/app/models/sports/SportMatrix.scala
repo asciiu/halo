@@ -12,7 +12,7 @@ object SportMatrix {
   def props(sportName: String) = Props(new SportMatrix(sportName))
 
   case class SendAllEvents(out: ActorRef)
-  case class SendEventOdds(eventID: Int, out: ActorRef)
+  case class SendEventOdds(eventID: String, out: ActorRef)
 }
 
 /**
@@ -33,6 +33,7 @@ class SportMatrix(val sportName: String) extends Actor with ActorLogging {
 
   // supports lookups by eventID
   private val sportingEventIds = mutable.Map[Int, String]()
+  private val prefix = sportName.substring(0, 3)
 
   def keys = matchMatrix.keys.toList.sorted
   def bookNames = allBookNames.toList.sorted
@@ -64,7 +65,8 @@ class SportMatrix(val sportName: String) extends Actor with ActorLogging {
       out ! gleam("")
 
     case SendEventOdds(eventID, out) =>
-      sportingEventIds.get(eventID) match {
+      val id = eventID.substring(3).toInt
+      sportingEventIds.get(id) match {
         case Some(key) =>
           val oddsm = matchMatrix(key)
           out ! oddsm.allOdds
@@ -118,7 +120,7 @@ class SportMatrix(val sportName: String) extends Actor with ActorLogging {
             // track this id with the key name
             sportingEventIds += newId -> key
 
-            val newMatrix = new OddsMatrixAB(newId, LocalDateTime.parse(evt.time, formatter), pair.optionA.name, pair.optionB.name)
+            val newMatrix = new OddsMatrixAB(prefix.concat(newId.toString), LocalDateTime.parse(evt.time, formatter), pair.optionA.name, pair.optionB.name)
             newMatrix.upsertOdds(odds)
             matchMatrix += key -> newMatrix
             newMatrix

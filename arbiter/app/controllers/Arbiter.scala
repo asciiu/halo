@@ -85,7 +85,7 @@ class Arbiter @Inject() (val database: DBService,
     * @param eventID
     * @return json EventData object
     */
-  def sportEventOdds(eventID: Int) = AsyncStack { implicit request =>
+  def sportEventOdds(eventID: String) = AsyncStack { implicit request =>
     // get odds from matrix
     (matrix ? EventOdds(eventID)).mapTo[List[SportsBookOdds]].map { result =>
       println(result)
@@ -107,7 +107,7 @@ class Arbiter @Inject() (val database: DBService,
     * @param eventID
     * @return
     */
-  def event(eventID: Int) = AsyncStack { implicit request =>
+  def event(eventID: String) = AsyncStack { implicit request =>
     Future.successful(Ok(views.html.arbiter.event(loggedIn, eventID)))
   }
 

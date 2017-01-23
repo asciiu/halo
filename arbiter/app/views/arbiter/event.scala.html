@@ -1,13 +1,12 @@
-@(account: Option[Entity[Account]], eventID: Int)(implicit webJarAssets: WebJarAssets, messages: Messages)
+@(account: Option[Entity[Account]], eventID: String)(implicit webJarAssets: WebJarAssets, messages: Messages)
 
 @scripts = {
     <script type="text/javascript">
         $(window).on('load', function() {
-            arbiterJs.SportingEvent().initCharts(@eventID)
+            arbiterJs.SportingEvent().initCharts("@eventID")
         });
     </script>
 }
-
 
 @_template(account, scripts) {
 <div class="row">
