@@ -1,13 +1,9 @@
 package models.sports
 
-
+import common.models.halo.{BookOdds, EventData}
 import java.time.{LocalDateTime, ZoneOffset}
-
-import common.models.halo.{BookOdds, TimedPoint}
 import models.sports.analytics.OddsTracker
-
 import scala.collection.mutable
-
 
 /**
   * Keeps track of odds between a single pair (optionA vs optionB)
@@ -18,12 +14,8 @@ import scala.collection.mutable
   */
 class OddsMatrixAB(val eventID: String, val expiration: LocalDateTime, val optionA: String, val optionB: String) {
 
-  //private val odds = mutable.MutableList[SportsBookOdds]()
-
-  case class Oddity(optionA: OddsTracker, optionB: OddsTracker)
-
   // Maps bookname to the book odds
-  private val odds = mutable.Map[String, Oddity]()
+  private val odds = mutable.Map[String, OddsTracker]()
 
   private var isArb = false
 
@@ -42,9 +34,21 @@ class OddsMatrixAB(val eventID: String, val expiration: LocalDateTime, val optio
     */
   def allOdds: List[SportsBookOdds] = {
     odds.map {
-      case (bookname, oddity) =>
-        SportsBookOdds(bookname, oddity.optionA.currentOdds, oddity.optionB.currentOdds)
+      case (bookname, tracker) =>
+        SportsBookOdds(bookname, tracker.currentA, tracker.currentB)
     }.toList
+  }
+
+  /**
+    * @return EventData object
+    */
+  def allOddsHistory: EventData = {
+    val allOdds = odds.map {
+      case (bookname, tracker) =>
+        BookOdds(bookname, tracker.allOdds)
+    }.toList
+
+    EventData(key, expiration.toString, allOdds)
   }
 
   def allOddsA = allOdds.sortBy(_.bookname).map(_.a)
@@ -115,14 +119,12 @@ class OddsMatrixAB(val eventID: String, val expiration: LocalDateTime, val optio
   def upsertOdds(o: SportsBookOdds): Unit = {
     // if there are no odds trackers for this bookname
     odds.get(o.bookname) match {
-      case Some(oddity) =>
-        oddity.optionA.trackMovement(o.a)
-        oddity.optionB.trackMovement(o.b)
+      case Some(tracker) =>
+        tracker.trackMovement(o.a, o.b)
       case None =>
         val opened = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        val oA = new OddsTracker(optionA, o.a, opened)
-        val oB = new OddsTracker(optionB, o.b, opened)
-        odds += o.bookname -> Oddity(oA, oB)
+        val newTracker = new OddsTracker(key, o.a, o.b, opened)
+        odds += o.bookname -> newTracker
     }
 
     //val index = odds.indexWhere(_.bookname == bookname)

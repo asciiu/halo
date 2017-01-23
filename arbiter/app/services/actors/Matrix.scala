@@ -4,6 +4,7 @@ package services.actors
 import javax.inject.Inject
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
+import common.models.halo.{BookOdds, EventData}
 import models.sports.SportMatrix.{SendAllEvents, SendEventOdds}
 import models.sports.{OddsMatrixAB, SportMatrix, SportsBookOdds}
 import play.api.Configuration
@@ -78,7 +79,7 @@ class Matrix @Inject()(val database: DBService, conf: Configuration)
       case Some(key) =>
         matrices(key) ! SendEventOdds(eventID, sender)
       case None =>
-        sender ! List[SportsBookOdds]()
+        sender ! EventData("NA", "NA", List[BookOdds]())
     }
   }
 

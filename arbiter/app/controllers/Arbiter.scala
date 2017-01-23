@@ -87,20 +87,20 @@ class Arbiter @Inject() (val database: DBService,
     */
   def sportEventOdds(eventID: String) = AsyncStack { implicit request =>
     // get odds from matrix
-    (matrix ? EventOdds(eventID)).mapTo[List[SportsBookOdds]].map { result =>
+    (matrix ? EventOdds(eventID)).mapTo[EventData].map { result =>
       println(result)
+      Ok(upickle.default.write[EventData](result))
     }
 
-
-    // TODO read this crap from the proper sportsbooks
-    val nitro = mockData("Nitro")
-    val betcoin = mockData("Betcoin")
-    val cloudbet = mockData("Cloudbet")
-    val eventTime = LocalDateTime.now()
-
-    val data = EventData(eventID.toString, eventTime.toString, List(nitro, betcoin, cloudbet))
-
-    Future.successful(Ok(upickle.default.write[EventData](data)))
+    // TODO remove this test stuff
+//    val nitro = mockData("Nitro")
+//    val betcoin = mockData("Betcoin")
+//    val cloudbet = mockData("Cloudbet")
+//    val eventTime = LocalDateTime.now()
+//
+//    val data = EventData(eventID.toString, eventTime.toString, List(nitro, betcoin, cloudbet))
+//
+//    Future.successful(Ok(upickle.default.write[EventData](data)))
   }
 
   /**

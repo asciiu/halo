@@ -4,6 +4,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import common.models.halo.{BookOdds, EventData}
 
 import scala.collection.mutable
 
@@ -64,13 +65,17 @@ class SportMatrix(val sportName: String) extends Actor with ActorLogging {
     case SendAllEvents(out) =>
       out ! gleam("")
 
+    /**
+      * Sends EventData object to sender
+      */
     case SendEventOdds(eventID, out) =>
       val id = eventID.substring(3).toInt
       sportingEventIds.get(id) match {
         case Some(key) =>
           val oddsm = matchMatrix(key)
-          out ! oddsm.allOdds
+          out ! oddsm.allOddsHistory
         case None =>
+          out ! EventData("NA", "NA", List[BookOdds]())
       }
   }
 

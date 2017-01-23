@@ -23,7 +23,6 @@ object SportingEvent {
 
   @JSExport
   def initCharts(eventID: String) = {
-    println(eventID)
     //val matchName = jQuery("#match-name").html()
     // init the candle chart
     loadData(eventID).map { raw ⇒
