@@ -100,7 +100,6 @@ class Arbiter @Inject() (val database: DBService,
   def sportEventOdds(eventID: String) = AsyncStack { implicit request =>
     // get odds from matrix
     (matrix ? EventOdds(eventID)).mapTo[EventData].map { result =>
-      println(result)
       Ok(upickle.default.write[EventData](result))
     }
 
