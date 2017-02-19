@@ -61,7 +61,9 @@ class SportMatrix(val sportName: String) extends Actor with ActorLogging {
   }
 
   override def receive = {
-    case data: SportsBookData => updateData(data)
+    case data: SportsBookData =>
+      updateData(data)
+
     case SendAllEvents(out) =>
       out ! gleam("")
 

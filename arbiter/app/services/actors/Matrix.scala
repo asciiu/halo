@@ -87,7 +87,7 @@ class Matrix @Inject()(val database: DBService, conf: Configuration)
     val sportname = data.sport
     val bookname = data.bookname
 
-    // get matrix for single sport
+    // get matrix with sport name
     // example NBA Basketball
     val matrix = matrices.get(sportname) match {
       case Some(m) => m
@@ -97,7 +97,6 @@ class Matrix @Inject()(val database: DBService, conf: Configuration)
         nref
     }
 
-    //matrix.updateData(data)
     matrix ! data
   }
 }

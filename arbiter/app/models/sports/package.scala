@@ -1,9 +1,11 @@
 package models
 
+import common.models.halo.TimedPoint
 import play.api.libs.json.Json
 
 package object sports {
 
+  case class SportsBookTimedOdds(bookname: String, time: Long, a: Double, b: Double)
   case class SportsBookOdds(bookname: String, a: Double, b: Double)
   object SportsBookOdds {
     /**

@@ -1,8 +1,10 @@
 package models.sports
 
-import common.models.halo.{BookOdds, EventData}
+import common.models.halo.{BookOdds, EventData, TimedPoint}
 import java.time.{LocalDateTime, ZoneOffset}
+
 import models.sports.analytics.OddsTracker
+
 import scala.collection.mutable
 
 /**
@@ -16,8 +18,6 @@ class OddsMatrixAB(val eventID: String, val expiration: LocalDateTime, val optio
 
   // Maps bookname to the book odds
   private val odds = mutable.Map[String, OddsTracker]()
-
-  private var isArb = false
 
   def isExpired: Boolean = LocalDateTime.now().isAfter(expiration)
 
@@ -101,7 +101,30 @@ class OddsMatrixAB(val eventID: String, val expiration: LocalDateTime, val optio
   }
 
   def displayArb(eventName: String) = {
-    if (isArb == true) {
+
+    // compare the latest odds for A
+    // with each highest value for B in each snapshot
+
+    // compare the latest odds for B
+    // with each highest value for A in each snapshot
+
+    //if (odds.nonEmpty) {
+    //  val allBookOdds = odds.map { case (bookname, tracker) =>
+    //    SportsBookOdds(
+    //      bookname,
+    //      tracker.currentA,
+    //      tracker.currentB)
+    //    }.toList
+
+    //    // arb?
+    //    val higha = allBookOdds.sortBy(_.a).last
+    //    val highb = allBookOdds.sortBy(_.b).last
+    //    val total = 1 / higha.a + 1 / highb.b
+
+    //    if (total < 1.0) {
+    //    }
+    //  }
+
 //      val higha = highestA.head
 //      val highb = highestB.head
 //      val total = 1 / higha._2 + 1 / highb._2
@@ -113,35 +136,37 @@ class OddsMatrixAB(val eventID: String, val expiration: LocalDateTime, val optio
 //      println(s"$optionA: ${higha._1} - ${higha._2}")
 //      println(s"$optionB: ${highb._1} - ${highb._2}")
 //      println(s"total: ${total}")
-    }
   }
 
   def upsertOdds(o: SportsBookOdds): Unit = {
     // if there are no odds trackers for this bookname
-    odds.get(o.bookname) match {
+    val tracker = odds.get(o.bookname) match {
       case Some(tracker) =>
         tracker.trackMovement(o.a, o.b)
+        tracker
       case None =>
         val opened = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
         val newTracker = new OddsTracker(key, o.a, o.b, opened)
         odds += o.bookname -> newTracker
+        newTracker
     }
+  }
 
-    //val index = odds.indexWhere(_.bookname == bookname)
+  def snapShots: Unit = {
+    //odds.map { case (bookname, tracker) =>
+    //  SportsBookSnapShots(bookname, tracker.allOdds)
+    //}.toList
+    val allBookOdds = odds.map { case (bookname, tracker) =>
+      val odds = tracker.currentOdds
+      SportsBookTimedOdds(bookname, odds.timestamp, odds.a, odds.b)
+    }.toList
 
-    //// TODO track odds over time??
-    //// if previous odds present update it
-    //if (index != -1) {
-    //  odds.update(index, o)
-    //} else {
-    //  odds += o
-    //}
+    // arb?
+    val higha = allBookOdds.sortBy(_.a).last
+    val highb = allBookOdds.sortBy(_.b).last
 
-    //// arb?
-    //val higha = highestA.head
-    //val highb = highestB.head
-    //val total = 1 / higha._2 + 1 / highb._2
-    //if (total < 1.0) isArb = true
-    //else isArb = false
+    //val total = 1 / higha.a + 1 / highb.b
+    //if (total < 1.0) true
+    //else false
   }
 }
