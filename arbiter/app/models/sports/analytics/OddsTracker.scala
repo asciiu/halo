@@ -13,17 +13,26 @@ import scala.collection.mutable
   */
 class OddsTracker(val optionName: String, val openA: Double, val openB: Double, val opened: Long) {
 
+  private var movementCounter = 0
   private val odds = mutable.ListBuffer[TimedPoint]()
   odds.append(TimedPoint(opened, openA, openB))
 
-  def currentOdds = odds.last
-  def currentA = odds.last.a
-  def currentB = odds.last.b
+  def currentOdds: TimedPoint = odds.last
+  def currentA: Double = odds.last.a
+  def currentB: Double = odds.last.b
 
-  def allOdds = odds.toList
+  // sorted by timestamp
+  def allOdds: List[TimedPoint] = odds.toList
+
+  def movementCount = movementCounter
 
   def trackMovement(a: Double, b: Double): Boolean = {
-    val flag = if (currentA != a || currentB != b) true else false
+    val flag = if (currentA != a || currentB != b) {
+      movementCounter += 1
+      true
+    } else {
+      false
+    }
 
     val time = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
     odds.append(TimedPoint(time, a, b))
