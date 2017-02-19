@@ -28,6 +28,13 @@ class OddsMatrixAB(val eventID: String, val expiration: LocalDateTime, val optio
 
   def bookNames: Seq[String] = odds.keys.toSeq
 
+  def hasShifted(count: Int): Boolean = {
+    odds.find( _._2.movementCount > count) match {
+      case Some(_) => true
+      case None => false
+    }
+  }
+
   /**
     * All the latest odds
     * @return list of SportBookOdds

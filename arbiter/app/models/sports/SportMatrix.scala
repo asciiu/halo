@@ -14,6 +14,7 @@ object SportMatrix {
 
   case class SendAllEvents(out: ActorRef)
   case class SendEventOdds(eventID: String, out: ActorRef)
+  case class SendShiftedEvents(out: ActorRef, count: Option[Int])
 }
 
 /**
@@ -67,6 +68,9 @@ class SportMatrix(val sportName: String) extends Actor with ActorLogging {
     case SendAllEvents(out) =>
       out ! gleam("")
 
+    case SendShiftedEvents(out, countOpt) =>
+      out ! shiftedEvents(countOpt)
+
     /**
       * Sends EventData object to sender
       */
@@ -89,6 +93,12 @@ class SportMatrix(val sportName: String) extends Actor with ActorLogging {
     purgeExpiredData()
 
     matchMatrix.toList
+  }
+
+  def shiftedEvents(count: Option[Int]): List[(String, OddsMatrixAB)] = {
+    purgeExpiredData()
+
+    matchMatrix.filter(_._2.hasShifted(count.getOrElse(0))).toList
   }
 
   def purgeExpiredData() = {

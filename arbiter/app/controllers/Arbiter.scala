@@ -11,7 +11,7 @@ import jp.t2v.lab.play2.auth.OptionalAuthElement
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{Action, Controller}
-import services.actors.Matrix.{AllEvents, EventOdds}
+import services.actors.Matrix.{AllEvents, EventOdds, ShiftedEvents}
 
 import scala.concurrent.duration._
 import scala.concurrent.Future
@@ -55,6 +55,18 @@ class Arbiter @Inject() (val database: DBService,
     */
   def matrices(filter: Option[String]) = AsyncStack { implicit request =>
     (matrix ? AllEvents(filter)).mapTo[List[(String, OddsMatrixAB)]].map { list =>
+      // show ML only?
+      //val mlMatrices = list.filter(_._1.endsWith("ML"))
+      Ok(views.html.arbiter.grid(loggedIn, list))
+    }
+  }
+
+  /**
+    * Should display a view of betting lines with odds for a specific sport. Where the bettings lines
+    * have moved at least once.
+    */
+  def definite(count: Option[Int]) = AsyncStack { implicit request =>
+    (matrix ? ShiftedEvents(count)).mapTo[List[(String, OddsMatrixAB)]].map { list =>
       // show ML only?
       //val mlMatrices = list.filter(_._1.endsWith("ML"))
       Ok(views.html.arbiter.grid(loggedIn, list))
