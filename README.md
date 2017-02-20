@@ -20,8 +20,8 @@ appropriate.
 
 ### Database mapping code
 The file `models.db.Tables.scala` contains the database mapping code. It has been generated running the main class
-`utils.db.SourceCodeGenerator`. If you want to regenerate the database mapping code for any reason, check the
-config file `conf/application.conf` and run:
+`utils.db.SourceCodeGenerator`. If you want to regenerate the database mapping code for any reason, edit slick.dbs
+settings in the config file `conf/application.conf` and run:
 
     sbt tables
 

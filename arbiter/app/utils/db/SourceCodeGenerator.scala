@@ -14,7 +14,7 @@ import scala.concurrent.duration.Duration
   */
 object SourceCodeGenerator extends App {
 
-  val config = ConfigFactory.parseFile(new File("conf/application.conf"))
+  val config = ConfigFactory.parseFile(new File("arbiter/conf/application.conf"))
 
   val databaseURL = config.getString("slick.dbs.default.db.url")
   val databaseUser = config.getString("slick.dbs.default.db.user")
@@ -35,7 +35,7 @@ object SourceCodeGenerator extends App {
   val generatedFileClass = "Tables"
   val generatedFilePackage = "models.db"
   val generatedFileName = "Tables.scala"
-  val generatedFileOutputFolder = "app"
+  val generatedFileOutputFolder = "arbiter/app"
 
   val db = TetraoPostgresDriver.api.Database.forURL(
     url = databaseURL,
@@ -49,7 +49,19 @@ object SourceCodeGenerator extends App {
 
   val codegen = db.run(modelAction).map { model =>
 
+
     new slick.codegen.SourceCodeGenerator(model) {
+      override def entityName = dbTableName => dbTableName match {
+        case "users" => "AccountRow"
+        case "messages" => "MessageRow"
+        case _ => super.entityName(dbTableName)
+      }
+
+      override def tableName = dbTableName => dbTableName match {
+        case "users" => "Account"
+        case _ => super.tableName(dbTableName)
+      }
+
       override def Table = new Table(_) {
         table =>
 
@@ -69,13 +81,14 @@ object SourceCodeGenerator extends App {
               case "_text" => "List[String]"
 
               //enums
-              case "account_role" => "models.db.AccountRole.Value"
+              case "user_role" => "models.db.AccountRole.Value"
 
               case "text" => "String"
               case "varchar" => "String"
 
               case unknown => {
-                throw new IllegalArgumentException(s"Undefined type [$unknown]")
+                println(s"Undefined type [${unknown}]")
+                throw new IllegalArgumentException(s"Undefined type [${unknown}]")
               }
 
             }).getOrElse("String")

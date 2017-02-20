@@ -33,6 +33,7 @@ lazy val arbiterJs = (project in file("arbiterjs"))
 lazy val arbiter = (project in file("arbiter"))
 	.settings(commonSettings: _*)
 	.settings(routesGenerator := InjectedRoutesGenerator)
+  .settings(addCommandAlias("tables", "run-main utils.db.SourceCodeGenerator"): _*)
 	.settings(
 		libraryDependencies ++= Seq(
 		  "com.typesafe.slick" %% "slick" % "3.1.1",
@@ -65,7 +66,3 @@ lazy val common = (crossProject.crossType(CrossType.Pure) in file("common"))
 
 lazy val sharedJvm = common.jvm
 lazy val sharedJs = common.js
-
-
-//to generate models/db/Tables.scala
-addCommandAlias("tables", "run-main utils.db.SourceCodeGenerator")
