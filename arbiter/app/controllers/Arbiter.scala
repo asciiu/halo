@@ -28,6 +28,7 @@ import services.actors.Matrix.Gleam
 
 class Arbiter @Inject() (val database: DBService,
                          val messagesApi: MessagesApi,
+                         val normalizer: Normalizer,
                          @Named("coordinator") coordinator: ActorRef,
                          @Named("matrix") matrix: ActorRef,
                          implicit val webJarAssets: WebJarAssets)
@@ -44,8 +45,10 @@ class Arbiter @Inject() (val database: DBService,
         Future.successful(BadRequest(Json.obj("status" ->"KO", "message" -> JsError.toJson(errors))))
       },
       newBook => {
-        matrix ! Normalizer.process(newBook)
-        Future.successful(Ok(Json.obj("status" ->"OK", "message" -> ("Received") )))
+        normalizer.process(newBook).map { data =>
+          matrix ! data
+          Ok(Json.obj("status" ->"OK", "message" -> ("Received") ))
+        }
       }
     )
   }

@@ -2,13 +2,11 @@ package services.actors
 
 // external
 import akka.actor.{Actor, ActorLogging, ActorRef}
-import akka.util.Timeout
 import javax.inject.Inject
 import play.api.Configuration
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 import scala.language.postfixOps
-import scala.concurrent.duration._
 
 // internal
 import models.sports.SportingEventOrganizer

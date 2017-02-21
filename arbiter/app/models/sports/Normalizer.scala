@@ -1,69 +1,97 @@
 package models.sports
 
-import java.time.LocalDateTime
+// External
+import java.time.{LocalDateTime, OffsetDateTime}
 import java.time.format.DateTimeFormatter
+import javax.inject.Inject
+
+import com.sun.scenario.effect.Offset
+import models.db.Tables.TranslationsRow
 
 import scala.collection.mutable
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-object Normalizer {
+// Internal
+import models.db.Tables
+import services.DBService
+import utils.db.TetraoPostgresDriver.api._
 
-  def process(data: SportsBookData): SportsBookData = {
-    val pass1 = correctSportName(data)
-    val pass2 = correctEventName(pass1)
-    val pass3 = correctEventTime(pass2)
 
-    pass3
+class Normalizer @Inject() (val database: DBService) {
+
+  def process(data: SportsBookData): Future[SportsBookData] = {
+    val correctedTimes = correctEventTime(data)
+
+    correctSportName(correctedTimes).flatMap { correctedSportName =>
+      correctEventName(correctedSportName)
+    }
   }
 
-  def correctSportName(data: SportsBookData): SportsBookData = {
+  def correctSportName(data: SportsBookData): Future[SportsBookData] = {
     // we shall normalize the sport names from the books because these sport names
     // may be labeled differently on various bookmakers sites
     val sportname = data.sport
-    val normalized = sportname match {
-      // Cloudbet
-      case "American FootballUSANFL" => "NFL Football"
-      case "BasketballUSANBA" => "NBA Basketball"
 
-      // SportsBet
-      case "Football - USA: NFL" => "NFL Football"
-      case "Basketball - USA: NBA" => "NBA Basketball"
-      case "Basketball NBA" => "NBA Basketball"
-
-      case _ => sportname
+    val query = Tables.Translations.filter { row =>
+      row.context === "Sport Name" && row.wording === sportname
     }
 
-    data.copy(sport = normalized)
+    database.runAsync(query.result.headOption).map { opt =>
+      opt match {
+        case Some(row) => data.copy(sport = row.normalization)
+        case _ => data
+      }
+    }
   }
 
-  def correctEventName(data: SportsBookData): SportsBookData = {
+  def correctEventName(data: SportsBookData): Future[SportsBookData] = {
 
-    val newEvents = mutable.ListBuffer[SportsEvent]()
+    val teamNames = mutable.ListBuffer[String]()
     for (event <- data.events) {
-
-      // all event names should be in proper case
-      // uppercase first letter lower case all else
-      val name = event.name
-        .toLowerCase()
-        .split(' ')
-        .map(_.capitalize)
-        .mkString(" ")
-        .replace(" Vs ", " vs ")
-
-      val options = mutable.ListBuffer[SportsEventOption]()
-      for (option <- event.options) {
-        val optionName = option.name
-          .toLowerCase()
-          .split(' ')
-          .map(_.capitalize)
-          .mkString(" ")
-          .replace(" Ml", " ML")
-        options.append(option.copy(name = optionName))
-      }
-
-      newEvents.append(event.copy(name = name, options = options))
+      val name = event.name.replace(" Vs ", " vs ")
+      val teams = name.split(" vs ")
+      teamNames.append(teams: _*)
     }
 
-    data.copy(events = newEvents)
+    val query = Tables.Translations.filter { rows =>
+      rows.context === data.sport && rows.wording.inSet(teamNames)
+    }
+
+    val defaultTranslation = TranslationsRow(0, "", "", "", OffsetDateTime.now(), OffsetDateTime.now())
+
+    database.runAsync(query.result).map { rows =>
+      val newEvents = mutable.ListBuffer[SportsEvent]()
+
+      for (event <- data.events) {
+        // all event names should be in proper case
+        // uppercase first letter lower case all else
+        val name = event.name.replace(" Vs ", " vs ")
+        val teams = name.split(" vs ")
+
+        val team1 = rows.find(_.wording == teams(0))
+          .getOrElse(defaultTranslation.copy(normalization = teams(0))).normalization
+
+        val team2 = rows.find(_.wording == teams(1))
+          .getOrElse(defaultTranslation.copy(normalization = teams(1))).normalization
+
+        val normalized = name.replace(teams(0), team1).replace(teams(1), team2)
+
+        val options = mutable.ListBuffer[SportsEventOption]()
+        for (option <- event.options) {
+          val optionName = option.name
+            .replace(" Ml", " ML")
+            .replace(teams(0), team1)
+            .replace(teams(1), team2)
+
+          options.append(option.copy(name = optionName))
+        }
+
+        newEvents.append(event.copy(name = normalized, options = options))
+      }
+
+      data.copy(events = newEvents)
+    }
   }
 
   /**
