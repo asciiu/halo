@@ -9,7 +9,8 @@ CREATE TABLE translations (
     wording text NOT NULL,
     normalization text NOT NULL,
     created_at timestamp with time zone not null default now(),
-    updated_at timestamp with time zone not null default now()
+    updated_at timestamp with time zone not null default now(),
+    UNIQUE (context, wording)
 );
 
 # --- !Downs
