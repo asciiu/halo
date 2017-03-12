@@ -1,7 +1,8 @@
 package models.sports.analytics
 
 import common.models.halo.TimedPoint
-import java.time.{LocalDateTime, ZoneOffset}
+import java.time.{ZoneOffset, ZonedDateTime}
+
 import scala.collection.mutable
 
 /**
@@ -34,7 +35,8 @@ class OddsTracker(val optionName: String, val openA: Double, val openB: Double, 
       false
     }
 
-    val time = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+    val time = ZonedDateTime.now(ZoneOffset.UTC).toEpochSecond()
+
     odds.append(TimedPoint(time, a, b))
     flag
   }

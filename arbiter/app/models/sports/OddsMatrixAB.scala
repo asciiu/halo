@@ -1,10 +1,8 @@
 package models.sports
 
-import common.models.halo.{BookOdds, EventData, TimedPoint}
-import java.time.{LocalDateTime, ZoneOffset}
-
+import common.models.halo.{BookOdds, EventData}
+import java.time.{LocalDateTime, ZoneOffset, ZonedDateTime}
 import models.sports.analytics.OddsTracker
-
 import scala.collection.mutable
 
 /**
@@ -152,8 +150,9 @@ class OddsMatrixAB(val eventID: String, val expiration: LocalDateTime, val optio
         tracker.trackMovement(o.a, o.b)
         tracker
       case None =>
-        val opened = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        val newTracker = new OddsTracker(key, o.a, o.b, opened)
+        val time = ZonedDateTime.now(ZoneOffset.UTC).toEpochSecond()
+
+        val newTracker = new OddsTracker(key, o.a, o.b, time)
         odds += o.bookname -> newTracker
         newTracker
     }

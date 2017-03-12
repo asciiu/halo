@@ -1,8 +1,8 @@
 package arbiterJs
 
+
 import arbiterJs.chart.ClientRoutes
 import com.highcharts.HighchartsUtils._
-import com.highcharts.CleanJsObject
 import com.highstock.config.SeriesLineData
 import common.models.halo.EventData
 import org.scalajs.dom.ErrorEvent
@@ -14,7 +14,7 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 import js.JSConverters._
 import scala.concurrent.{Future, Promise}
-import scala.scalajs.js.JSON
+import scala.scalajs.js.{Date, JSON}
 
 case class Series(bookname: String, series: js.Array[SeriesLineData])
 
@@ -29,6 +29,11 @@ object SportingEvent {
       val str =  js.JSON.stringify(raw)
       val data = upickle.default.read[EventData](str)
 
+      val date = new Date()
+      // getTimezoneOffset is in minutes
+      // convert it to millis
+      val offset = date.getTimezoneOffset() * 60 * 1000
+
       val eventTime = data.eventTime
       val eventName = data.eventName.split(" vs ")
       val seriesData = data.books.map { book =>
@@ -36,15 +41,17 @@ object SportingEvent {
         val bookOdds = book.odds
 
         val seriesLineDataA = bookOdds.map { odds =>
+          val x = odds.timestamp
+
           SeriesLineData(
-            x = odds.timestamp.asInstanceOf[Double],
+            x = odds.timestamp.asInstanceOf[Double] * 1000 - offset,
             y = odds.a
           )
         }.toArray.toJSArray
 
         val seriesLineDataB = bookOdds.map { odds =>
           SeriesLineData(
-            x = odds.timestamp.asInstanceOf[Double],
+            x = odds.timestamp.asInstanceOf[Double] * 1000 - offset,
             y = odds.b
           )
         }.toArray.toJSArray
