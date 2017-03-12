@@ -23,7 +23,7 @@ object Matrix {
   case class Gleam(depth: Int)
   case class AllEvents(filter: Option[String])
   case class EventOdds(eventID: String)
-  case class ShiftedEvents(count: Option[Int])
+  case class ShiftedEvents(filter: Option[String], count: Option[Int])
 }
 
 /**
@@ -72,12 +72,22 @@ class Matrix @Inject()(val database: DBService, conf: Configuration)
     case EventOdds(eventID) =>
       getEventOdds(eventID)
 
-    case ShiftedEvents(countOpt) =>
-      if (matrices.nonEmpty) {
-        // defaults to head sport
-        matrices.head._2 ! SendShiftedEvents(sender, countOpt)
-      } else {
-        sender ! List[(String, OddsMatrixAB)]()
+    case ShiftedEvents(filterOpt, countOpt) =>
+      filterOpt match {
+        case Some(str) =>
+          matrices.keys.find(_.contains(str)) match {
+            case Some(key) =>
+              matrices(key) ! SendShiftedEvents(sender, countOpt)
+            case None =>
+              sender ! List[(String, OddsMatrixAB)]()
+          }
+        case None =>
+          if (matrices.nonEmpty) {
+            // defaults to head sport
+            matrices.head._2 ! SendShiftedEvents(sender, countOpt)
+          } else {
+            sender ! List[(String, OddsMatrixAB)]()
+          }
       }
   }
 

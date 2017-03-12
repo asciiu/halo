@@ -68,8 +68,8 @@ class Arbiter @Inject() (val database: DBService,
     * Should display a view of betting lines with odds for a specific sport. Where the bettings lines
     * have moved at least once.
     */
-  def definite(count: Option[Int]) = AsyncStack { implicit request =>
-    (matrix ? ShiftedEvents(count)).mapTo[List[(String, OddsMatrixAB)]].map { list =>
+  def definite(filter: Option[String], count: Option[Int]) = AsyncStack { implicit request =>
+    (matrix ? ShiftedEvents(filter, count)).mapTo[List[(String, OddsMatrixAB)]].map { list =>
       // show ML only?
       //val mlMatrices = list.filter(_._1.endsWith("ML"))
       Ok(views.html.arbiter.grid(loggedIn, list))

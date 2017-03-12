@@ -30,7 +30,7 @@ GET     /webjars/*file              controllers.WebJarAssets.at(file)
 # ARBITER ROUTES
 POST    /events                     controllers.Arbiter.addEvents()
 GET     /matrices                   controllers.Arbiter.matrices(filter: Option[String])
-GET     /arbiter/definite           controllers.Arbiter.definite(count: Option[Int])
+GET     /arbiter/definite           controllers.Arbiter.definite(filter: Option[String], count: Option[Int])
 GET     /arbiter/allSportNames      controllers.Arbiter.allSportNames()
 GET     /arbiter/event/:eventID     controllers.Arbiter.event(eventID: String)
 GET     /arbiter/odds               controllers.Arbiter.sportEventOdds(eventID: String)
