@@ -29,8 +29,8 @@ CREATE TABLE message (
     updated_at timestamp with time zone not null default now()
 );
 
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO player;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO player;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO bishop;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO bishop;
 
 -- bcrypted password values are password in both users
 INSERT INTO users (name, email, email_confirmed, role, password) values ('Admin User', 'admin@email.com', true, 'admin', '$2a$10$8K1p/a0dL1LXMIgoEDFrwOfMQbLgtnOoKsWc.6U6H0llP3puzeeEu');
